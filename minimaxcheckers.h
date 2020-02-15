@@ -2,28 +2,47 @@
 #define MINIMAXCHECKERS_H
 
 #include "minimax.h"
+#include <string>
+#include <cassert>
 
-template<typename T>
-class MiniMaxCheckers : public MiniMax<T>
+class MiniMaxCheckers : public MiniMax<std::string>
 {
+public:
+    explicit MiniMaxCheckers(const char emptyField,
+                             const char cpuPawn,
+                             const char playerPawn,
+                             const char cpuCrownhead,
+                             const char playerCrownhead,
+                             const uint8_t crownheadFactor = 2, 
+                             const uint8_t pawnFactor = 1);
+
+    // Test function
+    void testStaticEval();
+
 protected:
-    int staticEval(T gameState, bool maximizingPlayer) override;
+    std::pair<std::string, int> staticEval(std::string gameState) override;
 
-    std::list<T> buildChildren(T gameState) override;
+    std::list<std::string> buildChildren(std::string gameState) override;
+
+private:
+    struct Figures
+    {
+        char emptyField;
+        char cpuPawn;
+        char playerPawn;
+        char cpuCrownhead;
+        char playerCrownhead;
+    };
+
+    std::string buildChild(const std::string& gameState);
+
+    const uint8_t m_boardEdge = 8;
+
+    uint8_t m_crownheadFactor = 2;
+
+    uint8_t m_pawnFactor = 1;
+
+    Figures m_figures;
 };
-
-template<typename T>
-int MiniMaxCheckers<T>::staticEval(T gameState, bool maximizingPlayer) 
-{
-    return 0;
-}
-
-template<typename T>
-std::list<T> MiniMaxCheckers<T>::buildChildren(T gameState)
-{
-    std::list<T> children;
-
-    return children;
-}
 
 #endif

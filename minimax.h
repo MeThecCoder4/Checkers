@@ -4,22 +4,22 @@
 #include <list>
 #include <algorithm>
 #include <climits>
+#include <utility>
 
 template<typename T>
 class MiniMax
 {
 public:
-    int search(T gameState, unsigned int depth, bool maximizingPlayer);
+    std::pair<T, int> search(T gameState, unsigned int depth, bool maximizingPlayer);
 
 protected:
-    virtual int staticEval(T gameState, bool maximizingPlayer) = 0;
+    virtual std::pair<T, int> staticEval(T gameState) = 0;
 
     virtual std::list<T> buildChildren(T gameState) = 0;
-
 };
 
 template<typename T>
-int MiniMax<T>::search(T gameState, unsigned int depth, bool maximizingPlayer)
+std::pair<T, int> MiniMax<T>::search(T gameState, unsigned int depth, bool maximizingPlayer)
 {
     if(depth == 0)
         return staticEval(gameState, maximizingPlayer);
@@ -27,28 +27,36 @@ int MiniMax<T>::search(T gameState, unsigned int depth, bool maximizingPlayer)
     if(maximizingPlayer)
     {
         int maxEvaluation = INT_MIN;
+        T maxState = gameState;
         std::list<T> children = buildChildren(gameState);
 
         for(const auto& child : children)
         {
-            int currentEvaluation = search(child, depth - 1, false);
-            maxEvaluation = std::max<int>(maxEvaluation, currentEvaluation);
+            std::pair<T, int> currentEvaluation = search(child, depth - 1, false);
+            maxEvaluation = std::max<int>(maxEvaluation, currentEvaluation.second);
+
+            if(maxEvaluation == currentEvaluation.second)
+                maxState = child;
         }
 
-        return maxEvaluation;
+        return std::pair<T, int>(maxState, maxEvaluation);
     }
     else
     {
         int minEvaluation = INT_MAX;
+        T minState = gameState;
         std::list<T> children = buildChildren(gameState);
 
         for(const auto& child : children)
         {
-            int currentEvaluation = search(child, depth - 1, true);
-            minEvaluation = std::min<int>(minEvaluation, currentEvaluation);
+            std::pair<T, int> currentEvaluation = search(child, depth - 1, true);
+            minEvaluation = std::min<int>(minEvaluation, currentEvaluation.second);
+
+            if(minEvaluation == currentEvaluation.second)
+                minState = child;
         }
 
-        return minEvaluation;
+        return std::pair<T, int>(minState, minEvaluation);
     }
 }
 
