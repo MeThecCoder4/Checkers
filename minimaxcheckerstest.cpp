@@ -3,6 +3,18 @@
 
 using namespace std;
 
+void MiniMaxCheckers::printState(const string& gameState)
+{
+    for(int i = 0; i < m_boardEdge; i++)
+    {
+        for(int j = 0; j < m_boardEdge; j++)
+        {
+            cout << gameState[i * m_boardEdge + j];
+        }
+        cout << endl;
+    }
+}
+
 void MiniMaxCheckers::testStaticEval()
 {
     string state1 = "00000000"
@@ -61,4 +73,229 @@ void MiniMaxCheckers::testStaticEval()
     {
         cout << e << endl << endl;
     }
+}
+
+void MiniMaxCheckers::testToIndex()
+{
+    FieldCoords coords1 = {2, 3};
+    assert(coords1.toIndex() == 19);
+
+    FieldCoords coords2 = {0, 0};
+    assert(coords2.toIndex() == 0);
+
+    FieldCoords coords3 = {7, 7};
+    assert(coords3.toIndex() == 63);
+
+    try
+    {
+        FieldCoords coords4 = {8, 2};
+        coords4.toIndex();
+    }
+    catch(const char* e)
+    {
+        std::cout << e << '\n';
+    }
+}
+
+void MiniMaxCheckers::testIsOnBoard()
+{
+    FieldCoords coords1 = {2, 3};
+    assert(coords1.isOnBoard() == true);
+
+    FieldCoords coords2 = {0, 0};
+    assert(coords2.isOnBoard() == true);
+
+    FieldCoords coords3 = {7, 7};
+    assert(coords3.isOnBoard() == true);
+
+    FieldCoords coords4 = {8, 2};
+    assert(coords4.isOnBoard() == false);
+}
+
+void MiniMaxCheckers::testIsFieldEmpty()
+{
+    string state1 = "00000000"
+                    "00010000"
+                    "00001000"
+                    "00010000"
+                    "00002000"
+                    "00200000"
+                    "20003000"
+                    "00000000";
+
+    FieldCoords coords1 = {2, 3};
+    assert(isFieldEmpty(state1, coords1) == true);
+
+    FieldCoords coords2 = {1, 3};
+    assert(isFieldEmpty(state1, coords2) == false);
+
+    FieldCoords coords3 = {6, 0};
+    assert(isFieldEmpty(state1, coords3) == false);
+
+    try
+    {
+        FieldCoords coords4 = {8, 2};
+        isFieldEmpty(state1, coords4);
+    }
+    catch(const char* e)
+    {
+        std::cerr << e << '\n';
+    }
+
+}
+
+void MiniMaxCheckers::testCalcCaptureCoords()
+{
+    // Test board example
+    // "00000000"
+    // "00000000"
+    // "00000200"
+    // "00001000"
+    // "00000000"
+    // "00000000"
+    // "00000000"
+    // "00000000"
+
+    FieldCoords captureCoords1 = calcCaptureCoords({3, 4}, {2, 5});
+    cout << "Calculated capture coords: (" + to_string(captureCoords1.x) << ", " << to_string(captureCoords1.y) + ')' << endl;
+    assert(captureCoords1.y == 1 && captureCoords1.x == 6);
+
+    FieldCoords captureCoords2 = calcCaptureCoords({2, 5}, {3, 4});
+    assert(captureCoords2.y == 4 && captureCoords2.x == 3);
+}
+
+void MiniMaxCheckers::testIsDiagonalTo()
+{
+    string state1 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "22200000"
+                    "21200000"
+                    "22200000"
+                    "00000000"
+                    "00000000";
+    
+    FieldCoords coords1 = {4, 1};
+    assert(coords1.isDiagonalTo({4, 0}) == false);
+
+    assert(coords1.isDiagonalTo({4, 2}) == false);
+
+    assert(coords1.isDiagonalTo({3, 2}) == true);
+
+    assert(coords1.isDiagonalTo({4, 1}) == false);
+
+    assert(coords1.isDiagonalTo({5, 0}) == true);
+}
+
+void MiniMaxCheckers::testPawnCapture()
+{
+    string state1 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";
+
+    assert(pawnCapture(state1, {3, 4}, {}) == state1);
+    
+    assert(pawnCapture(state1, {0, 0}, {}) == state1);
+
+    string state2 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00010000"
+                    "00022000"
+                    "00000000";
+
+    assert(pawnCapture(state2, {3, 4}, {}) == state2);
+
+    string state3 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00000000"
+                    "00020000"
+                    "00000100";   
+
+    assert(pawnCapture(state2, {5, 3}, {}) == state3);
+
+    string state4 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00001000"
+                    "00003000"
+                    "00010000"
+                    "00020000"
+                    "00000000";    
+
+    assert(pawnCapture(state4, {5, 3}, {}) == state4);
+
+    string state5 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00004000"
+                    "00010000"
+                    "00000000"
+                    "00000000";    
+
+    string state6 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000100"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";    
+
+    assert(pawnCapture(state5, {5, 3}, {}) == state6);
+
+    string state7 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000100"
+                    "00002000"
+                    "00010000"
+                    "00000000"
+                    "00000000";        
+
+    assert(pawnCapture(state7, {5, 3}, {}) == state7);  
+
+    string state8 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000300"
+                    "00002000"
+                    "00010000"
+                    "00000000"
+                    "00000000";        
+
+    assert(pawnCapture(state8, {5, 3}, {}) == state8);
+    
+    string state9 = "20000000"
+                    "01000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";     
+
+    assert(pawnCapture(state9, {1, 1}, {}) == state9);
+
+    string state10 = "20000000"
+                     "01000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000";     
+
+    assert(pawnCapture(state10, {0, 0}, {{2, 2}}) == state10);    
 }
