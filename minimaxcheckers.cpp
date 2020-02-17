@@ -57,6 +57,15 @@ std::list<std::string> MiniMaxCheckers::buildFieldChildren(const string& gameSta
 {   
     list<string> fieldChildStates;
     list<FieldCoords> visited;
+    FieldCoords currentField;
+    
+    for(currentField.y = 0; currentField.y < m_boardEdge; currentField.y++)
+    {
+        for(currentField.x = 0; currentField.x < m_boardEdge; currentField.x++)
+        {
+            
+        }
+    }
 
     return fieldChildStates;
 }
@@ -75,38 +84,35 @@ std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                                                         m_figures.playerCrownhead : m_figures.cpuCrownhead;
     FieldCoords neighs;                                                              
     
-    for(neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y++)
+    for(neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y += 2)
     {
-        for(neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x++)
+        for(neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x += 2)
         {
-            if((neighs.y != coords.y || neighs.x != coords.x))
+            if(neighs.isOnBoard())
             {
-                if(neighs.isOnBoard() && coords.isDiagonalTo(neighs))
+                // If current neighbour field wasn't visited before
+                if(find_if(visited.begin(), visited.end(), 
+                [&neighs](FieldCoords current)
                 {
-                    // If current neighbour field wasn't visited before
-                    if(find_if(visited.begin(), visited.end(), 
-                    [&neighs](FieldCoords current)
+                    return current.y == neighs.y && current.x == neighs.x;
+                }) == visited.end())
+                {
+                    if(childState[neighs.toIndex()] == opponentPawn ||
+                        childState[neighs.toIndex()] == opponentCrownhead)
                     {
-                        return current.y == neighs.y && current.x == neighs.x;
-                    }) == visited.end())
-                    {
-                        if(childState[neighs.toIndex()] == opponentPawn ||
-                           childState[neighs.toIndex()] == opponentCrownhead)
-                        {
-                            // captureCoords are not coordinates of an opponent,
-                            // but the coordinates of a field behind it (diagonally)
-                            FieldCoords captureCoords = calcCaptureCoords(coords, neighs);
+                        // captureCoords are not coordinates of an opponent,
+                        // but the coordinates of a field behind it (diagonally)
+                        FieldCoords captureCoords = calcCaptureCoords(coords, neighs);
 
-                            if(captureCoords.isOnBoard())
+                        if(captureCoords.isOnBoard())
+                        {
+                            if(isFieldEmpty(childState, captureCoords))
                             {
-                                if(isFieldEmpty(childState, captureCoords))
-                                {
-                                    char opponent = childState[neighs.toIndex()];
-                                    childState[neighs.toIndex()] = m_figures.emptyField;
-                                    childState[captureCoords.toIndex()] = figure;
-                                    childState[coords.toIndex()] = m_figures.emptyField;
-                                    return childState;
-                                }
+                                char opponent = childState[neighs.toIndex()];
+                                childState[neighs.toIndex()] = m_figures.emptyField;
+                                childState[captureCoords.toIndex()] = figure;
+                                childState[coords.toIndex()] = m_figures.emptyField;
+                                return childState;
                             }
                         }
                     }
