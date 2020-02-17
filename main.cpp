@@ -13,6 +13,7 @@ int main()
     // mmc.testCalcCaptureCoords();
     // mmc.testPawnCapture();
     // mmc.testPawnMove();
+    mmc.testBuildFieldChildren();
     cout << "All tests passed." << endl;
     return 0;
 }

@@ -57,14 +57,23 @@ std::list<std::string> MiniMaxCheckers::buildFieldChildren(const string& gameSta
 {   
     list<string> fieldChildStates;
     list<FieldCoords> visited;
-    FieldCoords currentField;
     
-    for(currentField.y = 0; currentField.y < m_boardEdge; currentField.y++)
+    // First off, build all capture states
+    for(uint8_t i = 0; i < 4; i++)
     {
-        for(currentField.x = 0; currentField.x < m_boardEdge; currentField.x++)
-        {
-            
-        }
+        string childState = pawnCapture(gameState, coords, visited);
+
+        if(childState != gameState)
+            fieldChildStates.emplace_back(childState);
+    }
+    
+    // Only if there is no possibility of capturing
+    if(fieldChildStates.size() == 0)
+    {
+        list<string> moveChildren = pawnMove(gameState, coords);
+
+        for(const auto& child : moveChildren)
+            fieldChildStates.emplace_back(child);
     }
 
     return fieldChildStates;
@@ -72,7 +81,7 @@ std::list<std::string> MiniMaxCheckers::buildFieldChildren(const string& gameSta
 
 std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                                          const FieldCoords& coords,
-                                         const list<FieldCoords>& visited)
+                                         list<FieldCoords>& visited)
 {    
     string childState = gameState;
     char figure = gameState[coords.toIndex()];
@@ -112,6 +121,7 @@ std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                                 childState[neighs.toIndex()] = m_figures.emptyField;
                                 childState[captureCoords.toIndex()] = figure;
                                 childState[coords.toIndex()] = m_figures.emptyField;
+                                visited.emplace_back(neighs);
                                 return childState;
                             }
                         }

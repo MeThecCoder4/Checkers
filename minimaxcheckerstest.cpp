@@ -198,9 +198,10 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000";
 
-    assert(pawnCapture(state1, {3, 4}, {}) == state1);
+    list<FieldCoords> empty;
+    assert(pawnCapture(state1, {3, 4}, empty) == state1);
     
-    assert(pawnCapture(state1, {0, 0}, {}) == state1);
+    assert(pawnCapture(state1, {0, 0}, empty) == state1);
 
     string state2 = "00000000"
                     "00000000"
@@ -211,7 +212,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00022000"
                     "00000000";
 
-    assert(pawnCapture(state2, {3, 4}, {}) == state2);
+    assert(pawnCapture(state2, {3, 4}, empty) == state2);
 
     string state3 = "00000000"
                     "00000000"
@@ -222,7 +223,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00020000"
                     "00000100";   
 
-    assert(pawnCapture(state2, {5, 3}, {}) == state3);
+    assert(pawnCapture(state2, {5, 3}, empty) == state3);
 
     string state4 = "00000000"
                     "00000000"
@@ -233,7 +234,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00020000"
                     "00000000";    
 
-    assert(pawnCapture(state4, {5, 3}, {}) == state4);
+    assert(pawnCapture(state4, {5, 3}, empty) == state4);
 
     string state5 = "00000000"
                     "00000000"
@@ -253,7 +254,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000";    
 
-    assert(pawnCapture(state5, {5, 3}, {}) == state6);
+    assert(pawnCapture(state5, {5, 3}, empty) == state6);
 
     string state7 = "00000000"
                     "00000000"
@@ -264,7 +265,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000";        
 
-    assert(pawnCapture(state7, {5, 3}, {}) == state7);  
+    assert(pawnCapture(state7, {5, 3}, empty) == state7);  
 
     string state8 = "00000000"
                     "00000000"
@@ -275,7 +276,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000";        
 
-    assert(pawnCapture(state8, {5, 3}, {}) == state8);
+    assert(pawnCapture(state8, {5, 3}, empty) == state8);
     
     string state9 = "20000000"
                     "01000000"
@@ -286,7 +287,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000";     
 
-    assert(pawnCapture(state9, {1, 1}, {}) == state9);
+    assert(pawnCapture(state9, {1, 1}, empty) == state9);
 
     string state10 = "20000000"
                      "01000000"
@@ -297,7 +298,8 @@ void MiniMaxCheckers::testPawnCapture()
                      "00000000"
                      "00000000";     
 
-    assert(pawnCapture(state10, {0, 0}, {{2, 2}}) == state10);    
+    list<FieldCoords> coords1 = {{2, 2}};
+    assert(pawnCapture(state10, {0, 0}, coords1) == state10);    
 }
 
 void MiniMaxCheckers::testPawnMove()
@@ -408,4 +410,142 @@ void MiniMaxCheckers::testPawnMove()
                      "00000000";
 
     assert(pawnMove(state10, {3, 3}) == list<string>());
+}
+
+void MiniMaxCheckers::testBuildFieldChildren()
+{
+    string state1 = "00000000"
+                    "00000000"
+                    "00010000"
+                    "00002000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    string state2 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000100"
+                    "00000000"
+                    "00000000"
+                    "00000000";      
+
+    list<string> comparisonStates1 = {state2}; 
+    assert(buildFieldChildren(state1, {2, 3}) == comparisonStates1);
+
+    string state3 = "00000000"
+                    "00000000"
+                    "00010000"
+                    "00402000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";    
+
+    string state4 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00002000"
+                    "01000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";     
+
+    string state5 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00400000"
+                    "00000100"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    list<string> comparisonStates2 = {state4, state5};
+    assert(buildFieldChildren(state3, {2, 3}) == comparisonStates2);
+
+    string state6 = "00000000"
+                    "00000000"
+                    "00010000"
+                    "00402000"
+                    "01000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";       
+
+    string state7 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00400000"
+                    "01000100"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    list<string> comparisonStates3 = {state7};
+    assert(buildFieldChildren(state6, {2, 3}) == comparisonStates3);
+
+    string state8 = "01000100"
+                    "00000000"
+                    "00010000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"; 
+
+    string state9 = "01000100"
+                    "00100000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"; 
+
+    string state10 = "01000100"
+                     "00001000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000";  
+
+    list<string> comparisonStates4 = {state9, state10};
+    assert(buildFieldChildren(state8, {2, 3}) == comparisonStates4);   
+    
+    string state11 = "00000000"
+                     "00100000"
+                     "00020000"
+                     "00000000"
+                     "00020000"
+                     "00000000"
+                     "00000000"
+                     "00000000";      
+
+    string state12 = "00000000"
+                     "00000000"
+                     "00000000"
+                     "00001000"
+                     "00020000"
+                     "00000000"
+                     "00000000"
+                     "00000000";    
+
+    string state13 = "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00100000"
+                     "00000000"
+                     "00000000";   
+
+    list<string> comparisonStates5 = {state12};
+    assert(buildFieldChildren(state11, {1, 2}) == comparisonStates5);
+
+    list<string> comparisonStates6 = {state13};
+    assert(buildFieldChildren(state12, {3, 4}) == comparisonStates6);
 }

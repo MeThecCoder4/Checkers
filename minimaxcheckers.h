@@ -33,6 +33,8 @@ public:
 
     void testPawnMove();
 
+    void testBuildFieldChildren();
+
     void printState(const std::string& gameState);
 
 protected:
@@ -87,7 +89,7 @@ private:
 
     std::string pawnCapture(const std::string& gameState,
                             const FieldCoords& coords,
-                            const std::list<FieldCoords>& visited);
+                            std::list<FieldCoords>& visited);
 
     std::list<std::string> pawnMove(const std::string& gameState,
                                     const FieldCoords& coords);                        
