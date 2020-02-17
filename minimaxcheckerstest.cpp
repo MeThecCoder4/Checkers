@@ -299,3 +299,113 @@ void MiniMaxCheckers::testPawnCapture()
 
     assert(pawnCapture(state10, {0, 0}, {{2, 2}}) == state10);    
 }
+
+void MiniMaxCheckers::testPawnMove()
+{
+    string state1 = "00000000"
+                    "00000000"
+                    "00020000"
+                    "00000000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00000000";    
+    
+    string state2 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00200000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00000000";   
+
+    string state3 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00002000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00000000";   
+
+    list<string> compareStates1 = {state2, state3};
+    list<string> resultStates1 = pawnMove(state1, {2, 3});
+    assert(resultStates1 == compareStates1);
+
+    string state4 = "00000000"
+                    "00000000"
+                    "00020000"
+                    "00000000"
+                    "00010000"
+                    "00000000"
+                    "00000000"
+                    "00000000";    
+
+    string state5 = "00000000"
+                    "00000000"
+                    "00020000"
+                    "00000000"
+                    "00000100"
+                    "00000000"
+                    "00000000"
+                    "00000000";                    
+
+    list<string> compareStates2 = {state4, state5};
+    list<string> resultStates2 = pawnMove(state1, {5, 4});
+    assert(resultStates2 == compareStates2);
+
+    string state6 = "00010000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";    
+        
+    assert(pawnMove(state6, {0, 3}) == list<string>());
+
+    string state7 = "00000000"
+                    "00200000"
+                    "00010000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    string state8 = "00000000"
+                    "00201000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    list<string> compareStates3 = {state8};
+    assert(pawnMove(state7, {2, 3}) == compareStates3);   
+
+    string state9 = "00000020"
+                    "00000001"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";
+    
+    assert(pawnMove(state9, {1, 7}) == list<string>());
+
+    string state10 = "00000000"
+                     "00000000"
+                     "00000000"
+                     "00030000"
+                     "00000000"
+                     "00000000"
+                     "00000000"
+                     "00000000";
+
+    assert(pawnMove(state10, {3, 3}) == list<string>());
+}

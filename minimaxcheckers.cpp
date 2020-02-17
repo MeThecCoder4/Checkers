@@ -1,5 +1,4 @@
 #include "minimaxcheckers.h"
-#include <set>
 
 using namespace std;
 
@@ -94,6 +93,8 @@ std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                         if(childState[neighs.toIndex()] == opponentPawn ||
                            childState[neighs.toIndex()] == opponentCrownhead)
                         {
+                            // captureCoords are not coordinates of an opponent,
+                            // but the coordinates of a field behind it (diagonally)
                             FieldCoords captureCoords = calcCaptureCoords(coords, neighs);
 
                             if(captureCoords.isOnBoard())
@@ -132,4 +133,43 @@ MiniMaxCheckers::FieldCoords MiniMaxCheckers::calcCaptureCoords(const FieldCoord
 bool MiniMaxCheckers::isFieldEmpty(const std::string& gameState, const FieldCoords& coords)
 {
     return gameState[coords.toIndex()] == m_figures.emptyField;
+}
+
+list<string> MiniMaxCheckers::pawnMove(const string& gameState,
+                                       const FieldCoords& coords)
+{
+    char pawn = gameState[coords.toIndex()];
+    list<string> resultStates;
+
+    if(pawn != m_figures.cpuPawn && pawn != m_figures.playerPawn)
+        return list<string>();
+    
+    FieldCoords neighs[2];
+
+    // Cpu always goes up from its perspective, player goes down the board 
+    if(pawn == m_figures.cpuPawn)
+    {
+        neighs[0].y = neighs[1].y = coords.y - 1;
+        neighs[0].x = coords.x - 1;
+        neighs[1].x = coords.x + 1;
+    }
+    else
+    {
+        neighs[0].y = neighs[1].y = coords.y + 1;
+        neighs[0].x = coords.x - 1;
+        neighs[1].x = coords.x + 1;
+    }
+
+    for(int8_t i = 0; i < 2; i++)
+    {
+        if(neighs[i].isOnBoard() && isFieldEmpty(gameState, neighs[i]))
+        {
+            string childState = gameState;
+            childState[coords.toIndex()] = m_figures.emptyField;
+            childState[neighs[i].toIndex()] = pawn;
+            resultStates.emplace_back(childState);
+        }
+    }
+
+    return resultStates;
 }
