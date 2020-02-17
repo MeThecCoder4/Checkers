@@ -1,4 +1,5 @@
 #include "minimaxcheckers.h"
+#include <iostream>
 
 using namespace std;
 
@@ -42,17 +43,53 @@ std::pair<std::string, int> MiniMaxCheckers::staticEval(std::string gameState)
     return pair<string, int>(gameState, cpuPoints - playerPoints);
 }
 
-std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState)
+std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, bool maximizingPlayer)
 {
     if(gameState.length() != m_boardEdge * m_boardEdge)
         throw "Invalid state length.";
 
     std::list<std::string> children;
+    FieldCoords coords;
+    char pawn = m_figures.playerPawn, crownhead = m_figures.playerCrownhead;
 
+    if(maximizingPlayer)
+    {
+        pawn = m_figures.cpuPawn;
+        crownhead = m_figures.cpuCrownhead;
+    }
+
+    for(coords.y = 0; coords.y < m_boardEdge; coords.y++)
+    {
+        if(coords.y % 2 == 0)
+            coords.x = 1;
+        else
+            coords.x = 0;
+
+        for(;coords.x < m_boardEdge; coords.x += 2)
+        {
+            if(gameState[coords.toIndex()] == pawn ||
+               gameState[coords.toIndex()] == crownhead)
+            {
+                pair<list<string>, bool> currentFieldChildren = buildFieldChildren(gameState, coords);
+
+                // There was a capture, forget all other states!
+                if(currentFieldChildren.second)
+                    return currentFieldChildren.first;
+
+                if(currentFieldChildren.first.size() > 0)
+                {
+                    for(const auto& child : currentFieldChildren.first)
+                        children.emplace_back(child);
+                }
+            }
+        }
+    }
+
+    // "Normal" flow, no captures
     return children;
 }
 
-std::list<std::string> MiniMaxCheckers::buildFieldChildren(const string& gameState,
+pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const string& gameState,
                                                            const FieldCoords& coords)
 {   
     list<string> fieldChildStates;
@@ -67,16 +104,18 @@ std::list<std::string> MiniMaxCheckers::buildFieldChildren(const string& gameSta
             fieldChildStates.emplace_back(childState);
     }
     
+    if(fieldChildStates.size() > 0)
+        return pair<list<string>, bool>(fieldChildStates, true);
     // Only if there is no possibility of capturing
-    if(fieldChildStates.size() == 0)
+    else
     {
         list<string> moveChildren = pawnMove(gameState, coords);
 
         for(const auto& child : moveChildren)
             fieldChildStates.emplace_back(child);
-    }
 
-    return fieldChildStates;
+        return pair<list<string>, bool>(fieldChildStates, false);
+    }
 }
 
 std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,

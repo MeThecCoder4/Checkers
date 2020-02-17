@@ -37,10 +37,12 @@ public:
 
     void printState(const std::string& gameState);
 
+    static const uint8_t m_boardEdge = 8;
+
 protected:
     std::pair<std::string, int> staticEval(std::string gameState) override;
 
-    std::list<std::string> buildChildren(std::string gameState) override;
+    std::list<std::string> buildChildren(std::string gameState, bool maximizingPlayer) override;
 
 private:
     struct Figures
@@ -84,8 +86,8 @@ private:
         }
     };
 
-    std::list<std::string> buildFieldChildren(const std::string& gameState,
-                                              const FieldCoords& coords);
+    std::pair<std::list<std::string>, bool> buildFieldChildren(const std::string& gameState,
+                                                               const FieldCoords& coords);
 
     std::string pawnCapture(const std::string& gameState,
                             const FieldCoords& coords,
@@ -98,8 +100,6 @@ private:
 
     // This function calculates coords of a field you move your figure to after the capture
     FieldCoords calcCaptureCoords(const FieldCoords& myCoords, const FieldCoords& opponentCoords);
-
-    static const uint8_t m_boardEdge = 8;
 
     uint8_t m_crownheadFactor;
 

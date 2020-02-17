@@ -15,20 +15,20 @@ public:
 protected:
     virtual std::pair<T, int> staticEval(T gameState) = 0;
 
-    virtual std::list<T> buildChildren(T gameState) = 0;
+    virtual std::list<T> buildChildren(T gameState, bool maximizingPlayer) = 0;
 };
 
 template<typename T>
 std::pair<T, int> MiniMax<T>::search(T gameState, unsigned int depth, bool maximizingPlayer)
 {
     if(depth == 0)
-        return staticEval(gameState, maximizingPlayer);
+        return staticEval(gameState);
     
     if(maximizingPlayer)
     {
         int maxEvaluation = INT_MIN;
         T maxState = gameState;
-        std::list<T> children = buildChildren(gameState);
+        std::list<T> children = buildChildren(gameState, true);
 
         for(const auto& child : children)
         {
@@ -39,13 +39,14 @@ std::pair<T, int> MiniMax<T>::search(T gameState, unsigned int depth, bool maxim
                 maxState = child;
         }
 
+        
         return std::pair<T, int>(maxState, maxEvaluation);
     }
     else
     {
         int minEvaluation = INT_MAX;
         T minState = gameState;
-        std::list<T> children = buildChildren(gameState);
+        std::list<T> children = buildChildren(gameState, false);
 
         for(const auto& child : children)
         {

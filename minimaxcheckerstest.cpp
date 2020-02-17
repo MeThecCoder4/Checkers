@@ -432,7 +432,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000";      
 
-    list<string> comparisonStates1 = {state2}; 
+    pair<list<string>, bool> comparisonStates1 = {{state2}, true}; 
     assert(buildFieldChildren(state1, {2, 3}) == comparisonStates1);
 
     string state3 = "00000000"
@@ -462,7 +462,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000";  
 
-    list<string> comparisonStates2 = {state4, state5};
+    pair<list<string>, bool> comparisonStates2 = {{state4, state5}, true};
     assert(buildFieldChildren(state3, {2, 3}) == comparisonStates2);
 
     string state6 = "00000000"
@@ -483,7 +483,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000";  
 
-    list<string> comparisonStates3 = {state7};
+    pair<list<string>, bool> comparisonStates3 = {{state7}, true};
     assert(buildFieldChildren(state6, {2, 3}) == comparisonStates3);
 
     string state8 = "01000100"
@@ -513,7 +513,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                      "00000000"
                      "00000000";  
 
-    list<string> comparisonStates4 = {state9, state10};
+    pair<list<string>, bool> comparisonStates4 = {{state9, state10}, true};
     assert(buildFieldChildren(state8, {2, 3}) == comparisonStates4);   
     
     string state11 = "00000000"
@@ -543,9 +543,9 @@ void MiniMaxCheckers::testBuildFieldChildren()
                      "00000000"
                      "00000000";   
 
-    list<string> comparisonStates5 = {state12};
+    pair<list<string>, bool> comparisonStates5 = {{state12}, true};
     assert(buildFieldChildren(state11, {1, 2}) == comparisonStates5);
 
-    list<string> comparisonStates6 = {state13};
+    pair<list<string>, bool> comparisonStates6 = {{state13}, true};
     assert(buildFieldChildren(state12, {3, 4}) == comparisonStates6);
 }
