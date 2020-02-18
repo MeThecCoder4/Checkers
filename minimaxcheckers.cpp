@@ -20,13 +20,13 @@ MiniMaxCheckers::MiniMaxCheckers(const char emptyField,
     m_figures.playerCrownhead = playerCrownhead;
 }
 
-std::pair<std::string, int> MiniMaxCheckers::staticEval(std::string gameState) 
+std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState) 
 {
     if(gameState.length() != m_boardEdge * m_boardEdge)
         throw "Invalid state length.";
     
     const int boardSize = m_boardEdge * m_boardEdge;
-    int playerPoints = 0, cpuPoints = 0;
+    long playerPoints = 0, cpuPoints = 0;
 
     for(const char& field : gameState)
     {
@@ -40,7 +40,7 @@ std::pair<std::string, int> MiniMaxCheckers::staticEval(std::string gameState)
             cpuPoints += m_crownheadFactor;
     }
 
-    return pair<string, int>(gameState, cpuPoints - playerPoints);
+    return pair<string, long>(gameState, cpuPoints - playerPoints);
 }
 
 std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, bool maximizingPlayer)
@@ -70,7 +70,9 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
             if(gameState[coords.toIndex()] == pawn ||
                gameState[coords.toIndex()] == crownhead)
             {
-                pair<list<string>, bool> currentFieldChildren = buildFieldChildren(gameState, coords);
+                pair<list<string>, bool> currentFieldChildren = buildFieldChildren(gameState,
+                                                                                   coords, 
+                                                                                   maximizingPlayer);
 
                 // There was a capture, forget all other states!
                 if(currentFieldChildren.second)
@@ -90,7 +92,8 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
 }
 
 pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const string& gameState,
-                                                           const FieldCoords& coords)
+                                                                       const FieldCoords& coords,
+                                                                       bool maximizingPlayer)
 {   
     list<string> fieldChildStates;
     list<FieldCoords> visited;
@@ -98,7 +101,7 @@ pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const str
     // First off, build all capture states
     for(uint8_t i = 0; i < 4; i++)
     {
-        string childState = pawnCapture(gameState, coords, visited);
+        string childState = pawnCapture(gameState, coords, visited, maximizingPlayer);
 
         if(childState != gameState)
             fieldChildStates.emplace_back(childState);
@@ -120,7 +123,8 @@ pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const str
 
 std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                                          const FieldCoords& coords,
-                                         list<FieldCoords>& visited)
+                                         list<FieldCoords>& visited,
+                                         bool maximizingPlayer)
 {    
     string childState = gameState;
     char figure = gameState[coords.toIndex()];
@@ -160,8 +164,33 @@ std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
                                 childState[neighs.toIndex()] = m_figures.emptyField;
                                 childState[captureCoords.toIndex()] = figure;
                                 childState[coords.toIndex()] = m_figures.emptyField;
+
+                                // Handle multi captures with recursion
+                                pair<string, long> bestState = staticEval(childState);
+                                list<FieldCoords> childVisited;
+
+                                for(int8_t i = 0; i < 4; i++)
+                                {
+                                    string nextChildState = pawnCapture(childState,
+                                                                        captureCoords,
+                                                                        childVisited,
+                                                                        maximizingPlayer);
+                                    pair<string, long> nextChildEval = staticEval(nextChildState);
+
+                                    if(maximizingPlayer)
+                                    {
+                                        if(nextChildEval.second > bestState.second)
+                                            bestState.first = nextChildEval.first;
+                                    }
+                                    else
+                                    {
+                                        if(nextChildEval.second < bestState.second)
+                                            bestState.first = nextChildEval.first;
+                                    }
+                                }
+
                                 visited.emplace_back(neighs);
-                                return childState;
+                                return bestState.first;
                             }
                         }
                     }

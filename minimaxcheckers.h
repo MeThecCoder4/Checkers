@@ -35,12 +35,14 @@ public:
 
     void testBuildFieldChildren();
 
+    void runAllTests();
+
     void printState(const std::string& gameState);
 
     static const uint8_t m_boardEdge = 8;
 
 protected:
-    std::pair<std::string, int> staticEval(std::string gameState) override;
+    std::pair<std::string, long> staticEval(std::string gameState) override;
 
     std::list<std::string> buildChildren(std::string gameState, bool maximizingPlayer) override;
 
@@ -56,12 +58,12 @@ private:
 
     struct FieldCoords
     {
-        uint8_t y;
-        uint8_t x;
+        int8_t y;
+        int8_t x;
 
         unsigned int toIndex() const
         {
-            if(y > m_boardEdge - 1 || x > m_boardEdge - 1)
+            if(y < 0 || x < 0 || y > m_boardEdge - 1 || x > m_boardEdge - 1)
                 throw "FieldCoords::toIndex(): out of array range";
 
             return y * m_boardEdge + x;
@@ -69,8 +71,8 @@ private:
 
         bool isOnBoard() const
         {
-            return y < m_boardEdge &&
-                   x < m_boardEdge;
+            return y >= 0 && y < m_boardEdge &&
+                   x >= 0 && x < m_boardEdge;
         }
 
         bool isDiagonalTo(const FieldCoords& otherCoords) const
@@ -87,11 +89,13 @@ private:
     };
 
     std::pair<std::list<std::string>, bool> buildFieldChildren(const std::string& gameState,
-                                                               const FieldCoords& coords);
+                                                               const FieldCoords& coords,
+                                                               bool maximizingPlayer);
 
     std::string pawnCapture(const std::string& gameState,
                             const FieldCoords& coords,
-                            std::list<FieldCoords>& visited);
+                            std::list<FieldCoords>& visited,
+                            bool maximizingPlayer);
 
     std::list<std::string> pawnMove(const std::string& gameState,
                                     const FieldCoords& coords);                        

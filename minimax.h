@@ -10,54 +10,64 @@ template<typename T>
 class MiniMax
 {
 public:
-    std::pair<T, int> search(T gameState, unsigned int depth, bool maximizingPlayer);
+    std::pair<T, long> search(T gameState, unsigned int depth,
+                             long alpha, long beta, bool maximizingPlayer);
 
 protected:
-    virtual std::pair<T, int> staticEval(T gameState) = 0;
+    virtual std::pair<T, long> staticEval(T gameState) = 0;
 
     virtual std::list<T> buildChildren(T gameState, bool maximizingPlayer) = 0;
 };
 
 template<typename T>
-std::pair<T, int> MiniMax<T>::search(T gameState, unsigned int depth, bool maximizingPlayer)
+std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
+                                     long alpha, long beta, bool maximizingPlayer)
 {
     if(depth == 0)
         return staticEval(gameState);
     
     if(maximizingPlayer)
     {
-        int maxEvaluation = INT_MIN;
+        long maxEvaluation = alpha;
         T maxState = gameState;
         std::list<T> children = buildChildren(gameState, true);
 
         for(const auto& child : children)
         {
-            std::pair<T, int> currentEvaluation = search(child, depth - 1, false);
-            maxEvaluation = std::max<int>(maxEvaluation, currentEvaluation.second);
+            std::pair<T, long> currentEvaluation = search(child, depth - 1, alpha, beta, false);
+            maxEvaluation = std::max<long>(maxEvaluation, currentEvaluation.second);
+            alpha = std::max<long>(alpha, maxEvaluation);
 
             if(maxEvaluation == currentEvaluation.second)
                 maxState = child;
+
+            if(beta <= alpha)
+                break;
         }
 
         
-        return std::pair<T, int>(maxState, maxEvaluation);
+        return std::pair<T, long>(maxState, maxEvaluation);
     }
     else
     {
-        int minEvaluation = INT_MAX;
+        long minEvaluation = beta;
         T minState = gameState;
         std::list<T> children = buildChildren(gameState, false);
 
         for(const auto& child : children)
         {
-            std::pair<T, int> currentEvaluation = search(child, depth - 1, true);
-            minEvaluation = std::min<int>(minEvaluation, currentEvaluation.second);
+            std::pair<T, long> currentEvaluation = search(child, depth - 1, alpha, beta, true);
+            minEvaluation = std::min<long>(minEvaluation, currentEvaluation.second);
+            beta = std::min<long>(beta, minEvaluation);
 
             if(minEvaluation == currentEvaluation.second)
                 minState = child;
+
+            if(beta <= alpha)
+                break;
         }
 
-        return std::pair<T, int>(minState, minEvaluation);
+        return std::pair<T, long>(minState, minEvaluation);
     }
 }
 
