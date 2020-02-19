@@ -4,12 +4,12 @@
 using namespace std;
 
 MiniMaxCheckers::MiniMaxCheckers(const char emptyField,
-                             const char cpuPawn,
-                             const char playerPawn,
-                             const char cpuCrownhead,
-                             const char playerCrownhead,
-                             const uint8_t crownheadFactor, 
-                             const uint8_t pawnFactor)
+                                 const char cpuPawn,
+                                 const char playerPawn,
+                                 const char cpuCrownhead,
+                                 const char playerCrownhead,
+                                 const uint8_t crownheadFactor, 
+                                 const uint8_t pawnFactor)
     : m_crownheadFactor(crownheadFactor),
       m_pawnFactor(pawnFactor)
 {
@@ -74,6 +74,9 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
                                                                                    coords, 
                                                                                    maximizingPlayer);
 
+                for(auto& child : currentFieldChildren.first)
+                    makeCrownheads(child);                                                                                   
+
                 // There was a capture, forget all other states!
                 if(currentFieldChildren.second)
                     return currentFieldChildren.first;
@@ -96,15 +99,20 @@ pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const str
                                                                        bool maximizingPlayer)
 {   
     list<string> fieldChildStates;
-    list<FieldCoords> visited;
+    bool isPawn = (gameState[coords.toIndex()] == m_figures.cpuPawn || 
+                    gameState[coords.toIndex()] == m_figures.playerPawn) ? true : false;
     
     // First off, build all capture states
-    for(uint8_t i = 0; i < 4; i++)
+    if(isPawn)
     {
-        string childState = pawnCapture(gameState, coords, visited, maximizingPlayer);
+        list<string> childStates = pawnCapture(gameState, coords, maximizingPlayer);
 
-        if(childState != gameState)
-            fieldChildStates.emplace_back(childState);
+        for(const auto& child : childStates)
+            fieldChildStates.emplace_back(child);
+    }
+    else
+    {
+
     }
     
     if(fieldChildStates.size() > 0)
@@ -112,85 +120,125 @@ pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const str
     // Only if there is no possibility of capturing
     else
     {
-        list<string> moveChildren = pawnMove(gameState, coords);
+        if(isPawn)
+        {
+            list<string> moveChildren = pawnMove(gameState, coords);
 
-        for(const auto& child : moveChildren)
-            fieldChildStates.emplace_back(child);
+            for(const auto& child : moveChildren)
+                fieldChildStates.emplace_back(child);
+        }
+        else
+        {
+
+        }
 
         return pair<list<string>, bool>(fieldChildStates, false);
     }
 }
 
-std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
-                                         const FieldCoords& coords,
-                                         list<FieldCoords>& visited,
-                                         bool maximizingPlayer)
-{    
+std::string MiniMaxCheckers::crownheadCapture(const std::string& gameState,
+                                              const FieldCoords& coords)
+{
     string childState = gameState;
+    list<FieldCoords> visited;
     char figure = gameState[coords.toIndex()];
 
-    char opponentPawn = (figure == m_figures.cpuPawn || figure == m_figures.cpuCrownhead) ?
-                                                        m_figures.playerPawn : m_figures.cpuPawn;
+    if(figure == m_figures.playerPawn || figure == m_figures.cpuPawn)
+        return gameState;
 
-    char opponentCrownhead = (figure == m_figures.cpuPawn || figure == m_figures.cpuCrownhead) ? 
-                                                        m_figures.playerCrownhead : m_figures.cpuCrownhead;
-    FieldCoords neighs;                                                              
+    char opponentPawn = (figure == m_figures.cpuCrownhead) ?
+         m_figures.playerPawn : m_figures.cpuPawn;
+        
+    char opponentCrownhead = (figure == m_figures.cpuCrownhead) ?
+         m_figures.playerCrownhead : m_figures.cpuCrownhead;
+
+    FieldCoords neighs;                 
+
+    return gameState;    
+}                                              
+
+list<std::string> MiniMaxCheckers::pawnCapture(const std::string& gameState,
+                                               const FieldCoords& coords,
+                                               bool maximizingPlayer)
+{    
+    char figure = gameState[coords.toIndex()];
+    list<FieldCoords> visited;
+    list<string> resultStates;
+
+    if(figure == m_figures.cpuCrownhead || figure == m_figures.playerCrownhead)
+        return list<string>();
+
+    char opponentPawn = (figure == m_figures.cpuPawn) ?
+                        m_figures.playerPawn : m_figures.cpuPawn;
+
+    char opponentCrownhead = (figure == m_figures.cpuPawn) ? 
+                              m_figures.playerCrownhead : m_figures.cpuCrownhead;
+
+    FieldCoords neighs;  
+    bool capture = true;      
     
-    for(neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y += 2)
+    while(capture)
     {
-        for(neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x += 2)
+        capture = false;
+
+        for(neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y += 2)
         {
-            if(neighs.isOnBoard())
+            for(neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x += 2)
             {
-                // If current neighbour field wasn't visited before
-                if(find_if(visited.begin(), visited.end(), 
-                [&neighs](FieldCoords current)
+                string childState = gameState;  
+                
+                if(neighs.isOnBoard())
                 {
-                    return current.y == neighs.y && current.x == neighs.x;
-                }) == visited.end())
-                {
-                    if(childState[neighs.toIndex()] == opponentPawn ||
-                        childState[neighs.toIndex()] == opponentCrownhead)
+                    // If current neighbour field wasn't visited before
+                    if(find_if(visited.begin(), visited.end(), 
+                    [&neighs](FieldCoords current)
                     {
-                        // captureCoords are not coordinates of an opponent,
-                        // but the coordinates of a field behind it (diagonally)
-                        FieldCoords captureCoords = calcCaptureCoords(coords, neighs);
-
-                        if(captureCoords.isOnBoard())
+                        return current.y == neighs.y && current.x == neighs.x;
+                    }) == visited.end())
+                    {
+                        if(childState[neighs.toIndex()] == opponentPawn ||
+                            childState[neighs.toIndex()] == opponentCrownhead)
                         {
-                            if(isFieldEmpty(childState, captureCoords))
+                            // captureCoords are not coordinates of an opponent,
+                            // but the coordinates of a field behind it (diagonally)
+                            FieldCoords captureCoords = calcCaptureCoords(coords, neighs);
+
+                            if(captureCoords.isOnBoard())
                             {
-                                char opponent = childState[neighs.toIndex()];
-                                childState[neighs.toIndex()] = m_figures.emptyField;
-                                childState[captureCoords.toIndex()] = figure;
-                                childState[coords.toIndex()] = m_figures.emptyField;
-
-                                // Handle multi captures with recursion
-                                pair<string, long> bestState = staticEval(childState);
-                                list<FieldCoords> childVisited;
-
-                                for(int8_t i = 0; i < 4; i++)
+                                if(isFieldEmpty(childState, captureCoords))
                                 {
-                                    string nextChildState = pawnCapture(childState,
+                                    char opponent = childState[neighs.toIndex()];
+                                    childState[neighs.toIndex()] = m_figures.emptyField;
+                                    childState[captureCoords.toIndex()] = figure;
+                                    childState[coords.toIndex()] = m_figures.emptyField;
+                                    capture = true;
+
+                                    // Handle multi captures with recursion
+                                    pair<string, long> bestState = staticEval(childState);
+                                    list<string> nextChildStates = pawnCapture(childState,
                                                                         captureCoords,
-                                                                        childVisited,
                                                                         maximizingPlayer);
-                                    pair<string, long> nextChildEval = staticEval(nextChildState);
 
-                                    if(maximizingPlayer)
+                                    for(const auto& nextChild : nextChildStates)
                                     {
-                                        if(nextChildEval.second > bestState.second)
-                                            bestState.first = nextChildEval.first;
+                                        pair<string, long> nextChildEval = staticEval(nextChild);
+
+                                        if(maximizingPlayer)
+                                        {
+                                            if(nextChildEval.second > bestState.second)
+                                                bestState.first = nextChildEval.first;
+                                        }
+                                        else
+                                        {
+                                            if(nextChildEval.second < bestState.second)
+                                                bestState.first = nextChildEval.first;
+                                        }
+
                                     }
-                                    else
-                                    {
-                                        if(nextChildEval.second < bestState.second)
-                                            bestState.first = nextChildEval.first;
-                                    }
+
+                                    visited.emplace_back(neighs);
+                                    resultStates.emplace_back(bestState.first);
                                 }
-
-                                visited.emplace_back(neighs);
-                                return bestState.first;
                             }
                         }
                     }
@@ -199,7 +247,7 @@ std::string MiniMaxCheckers::pawnCapture(const std::string& gameState,
         }
     }
 
-    return gameState;
+    return (resultStates.size() > 0) ? resultStates : list<string>();
 }
 
 MiniMaxCheckers::FieldCoords MiniMaxCheckers::calcCaptureCoords(const FieldCoords& myCoords,
@@ -219,6 +267,24 @@ bool MiniMaxCheckers::isFieldEmpty(const std::string& gameState, const FieldCoor
     return gameState[coords.toIndex()] == m_figures.emptyField;
 }
 
+void MiniMaxCheckers::makeCrownheads(std::string& gameState)
+{
+    FieldCoords coords;
+
+    for(coords.x = 0; coords.x < m_boardEdge; coords.x++)
+    {
+        coords.y = 0;
+
+        if(gameState[coords.toIndex()] == m_figures.cpuPawn)
+            gameState[coords.toIndex()] = m_figures.cpuCrownhead;
+        
+        coords.y = m_boardEdge - 1;
+
+        if(gameState[coords.toIndex()] == m_figures.playerPawn)
+            gameState[coords.toIndex()] = m_figures.playerCrownhead;        
+    }
+}
+
 list<string> MiniMaxCheckers::pawnMove(const string& gameState,
                                        const FieldCoords& coords)
 {
@@ -227,7 +293,7 @@ list<string> MiniMaxCheckers::pawnMove(const string& gameState,
 
     if(pawn != m_figures.cpuPawn && pawn != m_figures.playerPawn)
         return list<string>();
-    
+
     FieldCoords neighs[2];
 
     // Cpu always goes up from its perspective, player goes down the board 
@@ -250,7 +316,14 @@ list<string> MiniMaxCheckers::pawnMove(const string& gameState,
         {
             string childState = gameState;
             childState[coords.toIndex()] = m_figures.emptyField;
-            childState[neighs[i].toIndex()] = pawn;
+
+            if(pawn == m_figures.cpuPawn && neighs[i].y == 0)
+                childState[neighs[i].toIndex()] = m_figures.cpuCrownhead;
+            else if(pawn == m_figures.playerPawn && neighs[i].y == m_boardEdge - 1)
+                childState[neighs[i].toIndex()] = m_figures.playerCrownhead;
+            else
+                childState[neighs[i].toIndex()] = pawn;
+
             resultStates.emplace_back(childState);
         }
     }

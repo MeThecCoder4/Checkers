@@ -5,9 +5,10 @@ using namespace std;
 
 int main()
 {
-    MiniMaxCheckers mmc('0', '1', '2', '3', '4');
+    MiniMaxCheckers mmc('0', '1', '2', '3', '4', 2, 1);
     // mmc.runAllTests();
     pair<string, int> startState;
+    int depth = 10;
 
     startState.first = "02020202"
                        "20202020"
@@ -18,18 +19,21 @@ int main()
                        "01010101"
                        "10101010";
 
-    for(int i = 0; i < 40; i++)
+    mmc.printState(startState.first);
+    cout << endl;
+
+    for(int i = 0; i < 62; i++)
     {
         cout << "TURN: " << i << endl;
 
         if(i % 2 == 0)
         {
             cout << "1's turn:" << endl;
-            startState = mmc.search(startState.first, 10, LONG_MIN, LONG_MAX, true);   
+            startState = mmc.search(startState.first, depth, LONG_MIN, LONG_MAX, true);   
         }
         else
         {
-            startState = mmc.search(startState.first, 10, LONG_MIN, LONG_MAX, false);   
+            startState = mmc.search(startState.first, depth, LONG_MIN, LONG_MAX, false);   
             cout << "2's turn:" << endl;
         }
 
@@ -37,6 +41,5 @@ int main()
         mmc.printState(startState.first);
         cout << "Static evaluation: " << startState.second << endl << endl;        
     }
-
     return 0;
 }

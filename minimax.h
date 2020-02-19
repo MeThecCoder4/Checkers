@@ -32,6 +32,9 @@ std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
         T maxState = gameState;
         std::list<T> children = buildChildren(gameState, true);
 
+        if(children.size() == 0)
+            return staticEval(gameState);
+
         for(const auto& child : children)
         {
             std::pair<T, long> currentEvaluation = search(child, depth - 1, alpha, beta, false);
@@ -44,7 +47,6 @@ std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
             if(beta <= alpha)
                 break;
         }
-
         
         return std::pair<T, long>(maxState, maxEvaluation);
     }
@@ -53,6 +55,9 @@ std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
         long minEvaluation = beta;
         T minState = gameState;
         std::list<T> children = buildChildren(gameState, false);
+
+        if(children.size() == 0)
+            return staticEval(gameState);
 
         for(const auto& child : children)
         {

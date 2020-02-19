@@ -92,18 +92,23 @@ private:
                                                                const FieldCoords& coords,
                                                                bool maximizingPlayer);
 
-    std::string pawnCapture(const std::string& gameState,
-                            const FieldCoords& coords,
-                            std::list<FieldCoords>& visited,
-                            bool maximizingPlayer);
+    std::list<std::string> pawnCapture(const std::string& gameState,
+                                       const FieldCoords& coords,
+                                       bool maximizingPlayer);
+
+    std::string crownheadCapture(const std::string& gameState,
+                                 const FieldCoords& coords);
 
     std::list<std::string> pawnMove(const std::string& gameState,
-                                    const FieldCoords& coords);                        
+                                    const FieldCoords& coords);       
+
 
     bool isFieldEmpty(const std::string& gameState, const FieldCoords& coords);                            
 
     // This function calculates coords of a field you move your figure to after the capture
     FieldCoords calcCaptureCoords(const FieldCoords& myCoords, const FieldCoords& opponentCoords);
+
+    void makeCrownheads(std::string& gameState);
 
     uint8_t m_crownheadFactor;
 
