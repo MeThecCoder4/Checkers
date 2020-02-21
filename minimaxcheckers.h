@@ -13,7 +13,7 @@ public:
                              const char playerPawn,
                              const char cpuCrownhead,
                              const char playerCrownhead,
-                             const uint8_t crownheadFactor = 2, 
+                             const uint8_t crownheadFactor = 2,
                              const uint8_t pawnFactor = 1);
 
     // Test methods
@@ -37,7 +37,7 @@ public:
 
     void runAllTests();
 
-    void printState(const std::string& gameState);
+    void printState(const std::string &gameState);
 
     static const uint8_t m_boardEdge = 8;
 
@@ -63,7 +63,7 @@ private:
 
         unsigned int toIndex() const
         {
-            if(y < 0 || x < 0 || y > m_boardEdge - 1 || x > m_boardEdge - 1)
+            if (y < 0 || x < 0 || y > m_boardEdge - 1 || x > m_boardEdge - 1)
                 throw "FieldCoords::toIndex(): out of array range";
 
             return y * m_boardEdge + x;
@@ -75,40 +75,52 @@ private:
                    x >= 0 && x < m_boardEdge;
         }
 
-        bool isDiagonalTo(const FieldCoords& otherCoords) const
+        bool isDiagonalTo(const FieldCoords &otherCoords) const
         {
             return otherCoords.isOnBoard() &&
-                   y != otherCoords.y && 
+                   y != otherCoords.y &&
                    x != otherCoords.x;
         }
 
-        bool operator==(const FieldCoords& other)
+        bool operator==(const FieldCoords &other)
         {
             return y == other.y && x == other.x;
         }
     };
 
-    std::pair<std::list<std::string>, bool> buildFieldChildren(const std::string& gameState,
-                                                               const FieldCoords& coords,
+    std::pair<std::list<std::string>, bool> buildFieldChildren(const std::string &gameState,
+                                                               const FieldCoords &coords,
                                                                bool maximizingPlayer);
 
-    std::list<std::string> pawnCapture(const std::string& gameState,
-                                       const FieldCoords& coords,
+    std::list<std::string> pawnCapture(const std::string &gameState,
+                                       const FieldCoords &coords,
                                        bool maximizingPlayer);
 
-    std::string crownheadCapture(const std::string& gameState,
-                                 const FieldCoords& coords);
+    std::string crownheadCapture(const std::string &gameState,
+                                 const FieldCoords &coords);
 
-    std::list<std::string> pawnMove(const std::string& gameState,
-                                    const FieldCoords& coords);       
+    std::list<std::string> pawnMove(const std::string &gameState,
+                                    const FieldCoords &coords);
 
-
-    bool isFieldEmpty(const std::string& gameState, const FieldCoords& coords);                            
+    bool isFieldEmpty(const std::string &gameState, const FieldCoords &coords);
 
     // This function calculates coords of a field you move your figure to after the capture
-    FieldCoords calcCaptureCoords(const FieldCoords& myCoords, const FieldCoords& opponentCoords);
+    FieldCoords calcCaptureCoords(const FieldCoords &myCoords, const FieldCoords &opponentCoords);
 
-    void makeCrownheads(std::string& gameState);
+    bool isCoordsVisited(const std::list<FieldCoords> &list, const FieldCoords &coords);
+
+    void makeCrownheads(std::string &gameState);
+
+    void updateCaptureState(std::string &gameState, const FieldCoords &opponentCoords,
+                            const FieldCoords &myCurrentCoords,
+                            const FieldCoords &myNextCoords,
+                            char myFigure);
+
+    std::pair<char, char> getOpponentFigures(char figure);
+
+    std::pair<std::string, long> getNewBestState(const std::list<std::string> &nextStates,
+                                                 std::pair<std::string, long> currentBest,
+                                                 bool maximizingPlayer);
 
     uint8_t m_crownheadFactor;
 

@@ -1,6 +1,6 @@
 CC = g++
 DEPS = minimaxcheckers.h minimax.h
-SOURCES = main.cpp minimaxcheckers.cpp minimaxcheckerstest.cpp
+SOURCES = main.cpp minimaxcheckers.cpp tests/minimaxcheckerstest.cpp
 OBJS = main.o minimaxcheckers.o minimaxcheckerstest.o
 
 main: $(OBJS)

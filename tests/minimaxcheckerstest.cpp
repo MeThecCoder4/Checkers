@@ -1,4 +1,4 @@
-#include "minimaxcheckers.h"
+#include "../minimaxcheckers.h"
 #include <iostream>
 
 using namespace std;

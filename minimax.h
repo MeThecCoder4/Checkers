@@ -6,12 +6,12 @@
 #include <climits>
 #include <utility>
 
-template<typename T>
+template <typename T>
 class MiniMax
 {
 public:
     std::pair<T, long> search(T gameState, unsigned int depth,
-                             long alpha, long beta, bool maximizingPlayer);
+                              long alpha, long beta, bool maximizingPlayer);
 
 protected:
     virtual std::pair<T, long> staticEval(T gameState) = 0;
@@ -19,35 +19,35 @@ protected:
     virtual std::list<T> buildChildren(T gameState, bool maximizingPlayer) = 0;
 };
 
-template<typename T>
+template <typename T>
 std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
-                                     long alpha, long beta, bool maximizingPlayer)
+                                      long alpha, long beta, bool maximizingPlayer)
 {
-    if(depth == 0)
+    if (depth == 0)
         return staticEval(gameState);
-    
-    if(maximizingPlayer)
+
+    if (maximizingPlayer)
     {
         long maxEvaluation = alpha;
         T maxState = gameState;
         std::list<T> children = buildChildren(gameState, true);
 
-        if(children.size() == 0)
+        if (children.size() == 0)
             return staticEval(gameState);
 
-        for(const auto& child : children)
+        for (const auto &child : children)
         {
             std::pair<T, long> currentEvaluation = search(child, depth - 1, alpha, beta, false);
             maxEvaluation = std::max<long>(maxEvaluation, currentEvaluation.second);
             alpha = std::max<long>(alpha, maxEvaluation);
 
-            if(maxEvaluation == currentEvaluation.second)
+            if (maxEvaluation == currentEvaluation.second)
                 maxState = child;
 
-            if(beta <= alpha)
+            if (beta <= alpha)
                 break;
         }
-        
+
         return std::pair<T, long>(maxState, maxEvaluation);
     }
     else
@@ -56,19 +56,19 @@ std::pair<T, long> MiniMax<T>::search(T gameState, unsigned int depth,
         T minState = gameState;
         std::list<T> children = buildChildren(gameState, false);
 
-        if(children.size() == 0)
+        if (children.size() == 0)
             return staticEval(gameState);
 
-        for(const auto& child : children)
+        for (const auto &child : children)
         {
             std::pair<T, long> currentEvaluation = search(child, depth - 1, alpha, beta, true);
             minEvaluation = std::min<long>(minEvaluation, currentEvaluation.second);
             beta = std::min<long>(beta, minEvaluation);
 
-            if(minEvaluation == currentEvaluation.second)
+            if (minEvaluation == currentEvaluation.second)
                 minState = child;
 
-            if(beta <= alpha)
+            if (beta <= alpha)
                 break;
         }
 
