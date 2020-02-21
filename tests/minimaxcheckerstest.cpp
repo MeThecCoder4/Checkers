@@ -457,36 +457,6 @@ void MiniMaxCheckers::testPawnMove()
                      "00000000";
 
     assert(pawnMove(state10, {3, 3}) == list<string>());    
-
-    string state11 = "00000000"
-                     "00010000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000";
-                    
-    string state12 = "00300000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000";   
-
-    string state13 = "00003000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000"
-                     "00000000";  
-             
-    list<string> compareStates4 = {state12, state13};
-    assert(pawnMove(state11, {1, 3}) == compareStates4);
 }
 
 void MiniMaxCheckers::testBuildFieldChildren()

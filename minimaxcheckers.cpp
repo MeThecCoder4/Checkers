@@ -283,17 +283,12 @@ list<string> MiniMaxCheckers::pawnMove(const string &gameState,
 
     // Cpu always goes up from its perspective, player goes down the board
     if (pawn == m_figures.cpuPawn)
-    {
         neighs[0].y = neighs[1].y = coords.y - 1;
-        neighs[0].x = coords.x - 1;
-        neighs[1].x = coords.x + 1;
-    }
     else
-    {
         neighs[0].y = neighs[1].y = coords.y + 1;
-        neighs[0].x = coords.x - 1;
-        neighs[1].x = coords.x + 1;
-    }
+
+    neighs[0].x = coords.x - 1;
+    neighs[1].x = coords.x + 1;
 
     for (int8_t i = 0; i < 2; i++)
     {
@@ -301,14 +296,7 @@ list<string> MiniMaxCheckers::pawnMove(const string &gameState,
         {
             string childState = gameState;
             childState[coords.toIndex()] = m_figures.emptyField;
-
-            if (pawn == m_figures.cpuPawn && neighs[i].y == 0)
-                childState[neighs[i].toIndex()] = m_figures.cpuCrownhead;
-            else if (pawn == m_figures.playerPawn && neighs[i].y == m_boardEdge - 1)
-                childState[neighs[i].toIndex()] = m_figures.playerCrownhead;
-            else
-                childState[neighs[i].toIndex()] = pawn;
-
+            childState[neighs[i].toIndex()] = pawn;
             resultStates.emplace_back(childState);
         }
     }
