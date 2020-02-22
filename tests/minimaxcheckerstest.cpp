@@ -21,6 +21,8 @@ void MiniMaxCheckers::runAllTests()
 
     testPawnMove();
 
+    testGetCrownCaptureCoords();
+
     testBuildFieldChildren();
 
     cout << "All tests passed" << endl;
@@ -510,13 +512,6 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000";  
 
     pair<list<string>, bool> comparisonStates2 = {{state4, state5}, true};
-    pair<list<string>, bool> tests = buildFieldChildren(state3, {2, 3}, true);
-
-    for(const auto& test : tests.first)
-    {
-        printState(test);
-        cout << endl;
-    }
     assert(buildFieldChildren(state3, {2, 3}, true) == comparisonStates2);
 
     string state6 = "00000000"
@@ -590,4 +585,78 @@ void MiniMaxCheckers::testBuildFieldChildren()
 
     pair<list<string>, bool> comparisonStates5 = {{state12}, true};
     assert(buildFieldChildren(state11, {1, 2}, true) == comparisonStates5);
+}
+
+void MiniMaxCheckers::testGetCrownCaptureCoords()
+{
+    string state1 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00400000"
+                    "00000000"
+                    "00001000"
+                    "00000000"
+                    "00000000";  
+
+    string state2 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000400"
+                    "00000000";  
+
+    string state3 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000040";  
+
+    string state4 = "00000000"
+                    "00000000"
+                    "00030000"
+                    "00200000"
+                    "04000000"
+                    "00000000"
+                    "00000000"
+                    "00000000";  
+
+    list<string> comp1 = {state2, state3};
+    assert(getCrownCaptureStates(state1, {3, 2}, {1, 1}, pair<char, char>('1', '3')) == comp1);
+
+    assert(getCrownCaptureStates(state4, {2, 3}, {1, -1}, pair<char, char>('2', '4')) == list<string>());
+
+    string state5 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00300000"
+                    "00020000"
+                    "00000000"
+                    "00000400"
+                    "00000000"; 
+
+    string state6 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00003000"
+                    "00000400"
+                    "00000000"; 
+
+    string state7 = "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000000"
+                    "00000030"; 
+    
+    list<string> comp2 = {state6, state7};
+    assert(getCrownCaptureStates(state5, {3, 2}, {1, 1}, pair<char, char>('2', '4')) == comp2);
 }

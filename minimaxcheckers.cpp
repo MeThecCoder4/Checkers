@@ -151,22 +151,78 @@ std::string MiniMaxCheckers::crownheadCapture(const std::string &gameState,
     opponentPawn = opponentFigures.first;
     opponentCrownhead = opponentFigures.second;
     FieldCoords neighs;
-    bool capture = true;
+    bool anotherRound = true;
 
-    while (capture)
+    while (anotherRound)
     {
-        capture = false;
+        anotherRound = false;
 
         for (neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y += 2)
         {
             for (neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x += 2)
             {
-                string childState = gameState;
+                FieldCoords direction(neighs.y - coords.y, neighs.x - coords.x);
             }
         }
     }
 
     return gameState;
+}
+
+std::list<std::string> MiniMaxCheckers::getCrownCaptureStates(const std::string &gameState,
+                                                              const FieldCoords &startingCoords,
+                                                              const FieldCoords &direction,
+                                                              pair<char, char> opponentFigures)
+{
+    if (gameState[startingCoords.toIndex()] != m_figures.cpuCrownhead &&
+        gameState[startingCoords.toIndex()] != m_figures.playerCrownhead)
+        return list<string>();
+
+    bool capture = false;
+    int8_t multiplier = 2;
+    list<string> captureStatesList;
+    list<FieldCoords> enemyCoordsList;
+    FieldCoords currentField(startingCoords.y + direction.y,
+                             startingCoords.x + direction.x);
+
+    while (currentField.isOnBoard())
+    {
+        FieldCoords nextField(startingCoords.y + (multiplier * direction.y),
+                              startingCoords.x + (multiplier * direction.x));
+
+        // We can only jump over one figure in a row
+        if (!isFieldEmpty(gameState, currentField) && nextField.isOnBoard())
+            if (!isFieldEmpty(gameState, nextField))
+                break;
+
+        if (capture == false && (gameState[currentField.toIndex()] == opponentFigures.first ||
+                                 gameState[currentField.toIndex()] == opponentFigures.second))
+        {
+            capture = true;
+            enemyCoordsList.emplace_back(currentField);
+        }
+        else if(capture == true)
+        {
+            if (isFieldEmpty(gameState, currentField))
+            {
+                string childState = gameState;
+
+                for (const auto &enemyCoords : enemyCoordsList)
+                    childState[enemyCoords.toIndex()] = m_figures.emptyField;
+
+                childState[currentField.toIndex()] = childState[startingCoords.toIndex()];
+                childState[startingCoords.toIndex()] = m_figures.emptyField;
+                captureStatesList.emplace_back(childState);
+            }
+            else
+                enemyCoordsList.emplace_back(currentField);
+        }
+
+        multiplier++;
+        currentField = nextField;
+    }
+
+    return captureStatesList;
 }
 
 list<std::string> MiniMaxCheckers::pawnCapture(const std::string &gameState,
@@ -268,6 +324,35 @@ void MiniMaxCheckers::makeCrownheads(std::string &gameState)
         if (gameState[coords.toIndex()] == m_figures.playerPawn)
             gameState[coords.toIndex()] = m_figures.playerCrownhead;
     }
+}
+
+std::list<std::string> MiniMaxCheckers::crownheadMove(const std::string &gameState,
+                                                      const FieldCoords &coords)
+{
+    char crownhead = gameState[coords.toIndex()];
+    list<string> resultStates;
+
+    if (crownhead != m_figures.cpuCrownhead && crownhead != m_figures.playerCrownhead)
+        return list<string>();
+
+    FieldCoords neighs;
+
+    for (neighs.y = coords.y - 1; neighs.y <= coords.y + 1; neighs.y += 2)
+    {
+        for (neighs.x = coords.x - 1; neighs.x <= coords.x + 1; neighs.x += 2)
+        {
+            string childState = gameState;
+
+            if (neighs.isOnBoard() && isFieldEmpty(childState, neighs))
+            {
+                childState[neighs.toIndex()] = crownhead;
+                childState[coords.toIndex()] = m_figures.emptyField;
+                resultStates.emplace_back(childState);
+            }
+        }
+    }
+
+    return resultStates;
 }
 
 list<string> MiniMaxCheckers::pawnMove(const string &gameState,
