@@ -21,18 +21,16 @@ void MiniMaxCheckers::runAllTests()
 
     testPawnMove();
 
-    testGetCrownCaptureCoords();
-
     testBuildFieldChildren();
 
     cout << "All tests passed" << endl;
 }
 
-void MiniMaxCheckers::printState(const string& gameState)
+void MiniMaxCheckers::printState(const string &gameState)
 {
-    for(int i = 0; i < m_boardEdge; i++)
+    for (int i = 0; i < m_boardEdge; i++)
     {
-        for(int j = 0; j < m_boardEdge; j++)
+        for (int j = 0; j < m_boardEdge; j++)
         {
             cout << gameState[i * m_boardEdge + j];
         }
@@ -50,9 +48,10 @@ void MiniMaxCheckers::testStaticEval()
                     "00200000"
                     "20003000"
                     "00000000";
-    
+
     cout << "staticEval(): " << staticEval(state1).second << endl;
-    cout << "Expected: 2" << endl << endl;
+    cout << "Expected: 2" << endl
+         << endl;
     assert(staticEval(state1).second == 2);
 
     string state2 = "00000000"
@@ -63,9 +62,10 @@ void MiniMaxCheckers::testStaticEval()
                     "00000000"
                     "00000000"
                     "00000000";
-    
+
     cout << "staticEval(): " << staticEval(state2).second << endl;
-    cout << "Expected: 0" << endl << endl;
+    cout << "Expected: 0" << endl
+         << endl;
     assert(staticEval(state2).second == 0);
 
     string state3 = "00000000"
@@ -76,9 +76,10 @@ void MiniMaxCheckers::testStaticEval()
                     "00000010"
                     "00000000"
                     "00000444";
-    
+
     cout << "staticEval(): " << staticEval(state3).second << endl;
-    cout << "Expected: -4" << endl << endl;
+    cout << "Expected: -4" << endl
+         << endl;
     assert(staticEval(state3).second == -4);
 
     string state4 = "00000000"
@@ -88,15 +89,16 @@ void MiniMaxCheckers::testStaticEval()
                     "00001000"
                     "00000010"
                     "00000000"
-                    "0000044";    
+                    "0000044";
 
     try
     {
         staticEval(state4);
     }
-    catch(const char* e)
+    catch (const char *e)
     {
-        cout << e << endl << endl;
+        cout << e << endl
+             << endl;
     }
 
     string state5 = "00000000"
@@ -107,7 +109,7 @@ void MiniMaxCheckers::testStaticEval()
                     "00000000"
                     "00020000"
                     "40000000";
-    
+
     assert(staticEval(state5).second == -3);
 }
 
@@ -127,7 +129,7 @@ void MiniMaxCheckers::testToIndex()
         FieldCoords coords4 = {8, 2};
         coords4.toIndex();
     }
-    catch(const char* e)
+    catch (const char *e)
     {
         std::cout << e << '\n';
     }
@@ -176,11 +178,10 @@ void MiniMaxCheckers::testIsFieldEmpty()
         FieldCoords coords4 = {8, 2};
         isFieldEmpty(state1, coords4);
     }
-    catch(const char* e)
+    catch (const char *e)
     {
         std::cerr << e << '\n';
     }
-
 }
 
 void MiniMaxCheckers::testCalcCaptureCoords()
@@ -213,7 +214,7 @@ void MiniMaxCheckers::testIsDiagonalTo()
                     "22200000"
                     "00000000"
                     "00000000";
-    
+
     FieldCoords coords1 = {4, 1};
     assert(coords1.isDiagonalTo({4, 0}) == false);
 
@@ -238,7 +239,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000";
 
     assert(pawnCapture(state1, {3, 4}, true) == list<string>());
-    
+
     assert(pawnCapture(state1, {0, 0}, true) == list<string>());
 
     string state2 = "00000000"
@@ -259,7 +260,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000"
                     "00020000"
-                    "00000100";   
+                    "00000100";
 
     list<string> comp1 = {state3};
     assert(pawnCapture(state2, {5, 3}, true) == comp1);
@@ -271,7 +272,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00003000"
                     "00010000"
                     "00020000"
-                    "00000000";    
+                    "00000000";
 
     assert(pawnCapture(state4, {5, 3}, true) == list<string>());
 
@@ -282,7 +283,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00004000"
                     "00010000"
                     "00000000"
-                    "00000000";    
+                    "00000000";
 
     string state6 = "00000000"
                     "00000000"
@@ -291,7 +292,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";    
+                    "00000000";
 
     list<string> comp2 = {state6};
     assert(pawnCapture(state5, {5, 3}, true) == comp2);
@@ -303,9 +304,9 @@ void MiniMaxCheckers::testPawnCapture()
                     "00002000"
                     "00010000"
                     "00000000"
-                    "00000000";        
+                    "00000000";
 
-    assert(pawnCapture(state7, {5, 3}, true) == list<string>());  
+    assert(pawnCapture(state7, {5, 3}, true) == list<string>());
 
     string state8 = "00000000"
                     "00000000"
@@ -314,10 +315,10 @@ void MiniMaxCheckers::testPawnCapture()
                     "00002000"
                     "00010000"
                     "00000000"
-                    "00000000";        
+                    "00000000";
 
     assert(pawnCapture(state8, {5, 3}, true) == list<string>());
-    
+
     string state9 = "20000000"
                     "01000000"
                     "00000000"
@@ -325,7 +326,7 @@ void MiniMaxCheckers::testPawnCapture()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";     
+                    "00000000";
 
     assert(pawnCapture(state9, {1, 1}, true) == list<string>());
 
@@ -345,10 +346,10 @@ void MiniMaxCheckers::testPawnCapture()
                      "00000100"
                      "10101000"
                      "00000000"
-                     "00000000";  
+                     "00000000";
 
     list<string> comp3 = {state11};
-    assert(pawnCapture(state10, {0, 1}, false) == comp3);    
+    assert(pawnCapture(state10, {0, 1}, false) == comp3);
 }
 
 void MiniMaxCheckers::testPawnMove()
@@ -360,8 +361,8 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00001000"
                     "00000000"
-                    "00000000";    
-    
+                    "00000000";
+
     string state2 = "00000000"
                     "00000000"
                     "00000000"
@@ -369,7 +370,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00001000"
                     "00000000"
-                    "00000000";   
+                    "00000000";
 
     string state3 = "00000000"
                     "00000000"
@@ -378,7 +379,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00001000"
                     "00000000"
-                    "00000000";   
+                    "00000000";
 
     list<string> compareStates1 = {state2, state3};
     list<string> resultStates1 = pawnMove(state1, {2, 3});
@@ -391,7 +392,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00010000"
                     "00000000"
                     "00000000"
-                    "00000000";    
+                    "00000000";
 
     string state5 = "00000000"
                     "00000000"
@@ -400,7 +401,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00000100"
                     "00000000"
                     "00000000"
-                    "00000000";                    
+                    "00000000";
 
     list<string> compareStates2 = {state4, state5};
     list<string> resultStates2 = pawnMove(state1, {5, 4});
@@ -413,8 +414,8 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";    
-        
+                    "00000000";
+
     assert(pawnMove(state6, {0, 3}) == list<string>());
 
     string state7 = "00000000"
@@ -424,7 +425,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";  
+                    "00000000";
 
     string state8 = "00000000"
                     "00201000"
@@ -433,10 +434,10 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";  
+                    "00000000";
 
     list<string> compareStates3 = {state8};
-    assert(pawnMove(state7, {2, 3}) == compareStates3);   
+    assert(pawnMove(state7, {2, 3}) == compareStates3);
 
     string state9 = "00000020"
                     "00000001"
@@ -446,7 +447,7 @@ void MiniMaxCheckers::testPawnMove()
                     "00000000"
                     "00000000"
                     "00000000";
-    
+
     assert(pawnMove(state9, {1, 7}) == list<string>());
 
     string state10 = "00000000"
@@ -458,7 +459,7 @@ void MiniMaxCheckers::testPawnMove()
                      "00000000"
                      "00000000";
 
-    assert(pawnMove(state10, {3, 3}) == list<string>());    
+    assert(pawnMove(state10, {3, 3}) == list<string>());
 }
 
 void MiniMaxCheckers::testBuildFieldChildren()
@@ -470,7 +471,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";  
+                    "00000000";
 
     string state2 = "00000000"
                     "00000000"
@@ -479,9 +480,9 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000100"
                     "00000000"
                     "00000000"
-                    "00000000";      
+                    "00000000";
 
-    pair<list<string>, bool> comparisonStates1 = {{state2}, true}; 
+    pair<list<string>, bool> comparisonStates1 = {{state2}, true};
     assert(buildFieldChildren(state1, {2, 3}, true) == comparisonStates1);
 
     string state3 = "00000000"
@@ -491,7 +492,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000";    
+                    "00000000";
 
     string state4 = "00000000"
                     "00000000"
@@ -500,7 +501,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "01000000"
                     "00000000"
                     "00000000"
-                    "00000000";     
+                    "00000000";
 
     string state5 = "00000000"
                     "00000000"
@@ -509,7 +510,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000100"
                     "00000000"
                     "00000000"
-                    "00000000";  
+                    "00000000";
 
     pair<list<string>, bool> comparisonStates2 = {{state4, state5}, true};
     assert(buildFieldChildren(state3, {2, 3}, true) == comparisonStates2);
@@ -521,7 +522,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "01000000"
                     "00000000"
                     "00000000"
-                    "00000000";       
+                    "00000000";
 
     string state7 = "00000000"
                     "00000000"
@@ -530,7 +531,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "01000100"
                     "00000000"
                     "00000000"
-                    "00000000";  
+                    "00000000";
 
     pair<list<string>, bool> comparisonStates3 = {{state7}, true};
     assert(buildFieldChildren(state6, {2, 3}, true) == comparisonStates3);
@@ -542,7 +543,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000"; 
+                    "00000000";
 
     string state9 = "01000100"
                     "00100000"
@@ -551,7 +552,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                     "00000000"
                     "00000000"
                     "00000000"
-                    "00000000"; 
+                    "00000000";
 
     string state10 = "01000100"
                      "00001000"
@@ -560,11 +561,11 @@ void MiniMaxCheckers::testBuildFieldChildren()
                      "00000000"
                      "00000000"
                      "00000000"
-                     "00000000";  
+                     "00000000";
 
     pair<list<string>, bool> comparisonStates4 = {{state9, state10}, false};
-    assert(buildFieldChildren(state8, {2, 3}, false) == comparisonStates4);   
-    
+    assert(buildFieldChildren(state8, {2, 3}, false) == comparisonStates4);
+
     string state11 = "00000000"
                      "00100000"
                      "00020000"
@@ -572,7 +573,7 @@ void MiniMaxCheckers::testBuildFieldChildren()
                      "00020000"
                      "00000000"
                      "00000000"
-                     "00000000";      
+                     "00000000";
 
     string state12 = "00000000"
                      "00000000"
@@ -581,82 +582,8 @@ void MiniMaxCheckers::testBuildFieldChildren()
                      "00000000"
                      "00100000"
                      "00000000"
-                     "00000000";   
+                     "00000000";
 
     pair<list<string>, bool> comparisonStates5 = {{state12}, true};
     assert(buildFieldChildren(state11, {1, 2}, true) == comparisonStates5);
-}
-
-void MiniMaxCheckers::testGetCrownCaptureCoords()
-{
-    string state1 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00400000"
-                    "00000000"
-                    "00001000"
-                    "00000000"
-                    "00000000";  
-
-    string state2 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000400"
-                    "00000000";  
-
-    string state3 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000040";  
-
-    string state4 = "00000000"
-                    "00000000"
-                    "00030000"
-                    "00200000"
-                    "04000000"
-                    "00000000"
-                    "00000000"
-                    "00000000";  
-
-    list<string> comp1 = {state2, state3};
-    assert(getCrownCaptureStates(state1, {3, 2}, {1, 1}, pair<char, char>('1', '3')) == comp1);
-
-    assert(getCrownCaptureStates(state4, {2, 3}, {1, -1}, pair<char, char>('2', '4')) == list<string>());
-
-    string state5 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00300000"
-                    "00020000"
-                    "00000000"
-                    "00000400"
-                    "00000000"; 
-
-    string state6 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00003000"
-                    "00000400"
-                    "00000000"; 
-
-    string state7 = "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000000"
-                    "00000030"; 
-    
-    list<string> comp2 = {state6, state7};
-    assert(getCrownCaptureStates(state5, {3, 2}, {1, 1}, pair<char, char>('2', '4')) == comp2);
 }

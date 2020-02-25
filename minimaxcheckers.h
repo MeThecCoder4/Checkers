@@ -4,6 +4,7 @@
 #include "minimax.h"
 #include <string>
 #include <cassert>
+#include <set>
 
 class MiniMaxCheckers : public MiniMax<std::string>
 {
@@ -34,8 +35,6 @@ public:
     void testPawnMove();
 
     void testBuildFieldChildren();
-
-    void testGetCrownCaptureCoords();
 
     void runAllTests();
 
@@ -105,11 +104,11 @@ private:
             return newCoords;
         }
 
-        FieldCoords& operator=(const FieldCoords& other)
+        FieldCoords &operator=(const FieldCoords &other)
         {
-            if(&other == this)
+            if (&other == this)
                 return *this;
-            
+
             y = other.y;
             x = other.x;
             return *this;
@@ -127,8 +126,15 @@ private:
     std::list<std::string> pawnMove(const std::string &gameState,
                                     const FieldCoords &coords);
 
-    std::string crownheadCapture(const std::string &gameState,
-                                 const FieldCoords &coords);
+    std::list<std::pair<std::string,
+                        MiniMaxCheckers::FieldCoords>>
+    findNewCrownCaptures(const std::string &gameState,
+                         const FieldCoords &direction,
+                         const FieldCoords &startCoords);
+
+    std::list<std::string> crownheadCapture(const std::string& gameState,
+                                            const FieldCoords& coords,
+                                            bool maximizingPlayer);
 
     std::list<std::string> crownheadMove(const std::string &gameState,
                                          const FieldCoords &coords);
@@ -152,11 +158,6 @@ private:
     std::pair<std::string, long> getNewBestState(const std::list<std::string> &nextStates,
                                                  std::pair<std::string, long> currentBest,
                                                  bool maximizingPlayer);
-
-    std::list<std::string> getCrownCaptureStates(const std::string &gameState,
-                                                 const FieldCoords &startingCoords,
-                                                 const FieldCoords &direction,
-                                                 std::pair<char, char> opponentFigures);
 
     uint8_t m_crownheadFactor;
 
