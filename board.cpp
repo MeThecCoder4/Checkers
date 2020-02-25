@@ -6,7 +6,7 @@ using namespace Checkers;
 Board::Board(const sf::Vector2u &windowSize)
 {
     m_fieldEdgeLength = windowSize.x / m_boardSize;
-    buildBoard();
+    build();
 }
 
 void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -15,7 +15,7 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
     target.draw(m_vertices, states);
 }
 
-void Board::buildBoard()
+void Board::build()
 {
     m_vertices.setPrimitiveType(Quads);
     m_vertices.resize(m_boardSize * m_boardSize * 4); // 256 vertices
@@ -27,7 +27,7 @@ void Board::buildBoard()
         {
             Color fieldColor = Color::White;
 
-            if ((y % 2 == 0 && x % 2 != 0) || (y % 2 != 0 && x % 2 == 0))
+            if (isFieldValid(Vector2u(x, y)))
                 fieldColor = Color::Black;
 
             // Pointer to current quad
@@ -44,7 +44,7 @@ void Board::buildBoard()
             quad[2].position = Vector2f((x + 1) * m_fieldEdgeLength,
                                         (y + 1) * m_fieldEdgeLength);
             quad[2].color = fieldColor;
-            
+
             quad[3].position = Vector2f(x * m_fieldEdgeLength,
                                         (y + 1) * m_fieldEdgeLength);
             quad[3].color = fieldColor;
@@ -52,7 +52,24 @@ void Board::buildBoard()
     }
 }
 
-float Board::getFieldEdgeLength()
+float Board::getFieldEdgeLength() const
 {
     return m_fieldEdgeLength;
+}
+
+void Board::setFieldEdgeLength(const int windowEdgeLength)
+{
+    m_fieldEdgeLength = windowEdgeLength / m_boardSize;
+}
+
+uint8_t Board::getBoardSize() const
+{
+    return m_boardSize;
+}
+
+bool Board::isFieldValid(const sf::Vector2u &fieldCoords)
+{
+    uint8_t x = fieldCoords.x;
+    uint8_t y = fieldCoords.y;
+    return (y % 2 == 0 && x % 2 != 0) || (y % 2 != 0 && x % 2 == 0);
 }

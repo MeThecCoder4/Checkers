@@ -44,12 +44,12 @@ int main()
     // }
     try
     {
-        Game game(true);
+        Game game(false);
     }
     catch(const char* e)
     {
         cout << e << endl;
     }
-    
+
     return 0;
 }
