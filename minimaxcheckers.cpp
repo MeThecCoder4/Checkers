@@ -41,8 +41,8 @@ std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState)
         {
             char field = gameState[coords.toIndex()];
             float sumOfSquares = (!isFieldEmpty(gameState, coords)) ?
-                                    pow(static_cast<float>(coords.y), 2) +
-                                    pow(static_cast<float>(coords.x), 2) : 0.0f;
+                                    pow(static_cast<float>(coords.y - center.y), 2) +
+                                    pow(static_cast<float>(coords.x - center.x), 2) : 0.0f;
 
             if (field == m_figures.playerPawn)
             {
@@ -71,7 +71,7 @@ std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState)
         }
     }
 
-    float rewardForADFC = 3.0f;
+    float rewardForADFC = 5.0f;
 
     playerADFC /= playerCounter;
     cpuADFC /= cpuCounter;
@@ -80,6 +80,9 @@ std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState)
         playerADFC += rewardForADFC;
     else
         cpuADFC += rewardForADFC;
+
+    cpuPoints += cpuADFC;
+    playerPoints += playerADFC;
 
     return pair<string, long>(gameState, cpuPoints - playerPoints);
 }
