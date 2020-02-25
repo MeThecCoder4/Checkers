@@ -77,12 +77,9 @@ std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState)
     cpuADFC /= cpuCounter;
 
     if(playerADFC > cpuADFC)
-        playerADFC += rewardForADFC;
+        playerPoints += rewardForADFC;
     else
-        cpuADFC += rewardForADFC;
-
-    cpuPoints += cpuADFC;
-    playerPoints += playerADFC;
+        cpuPoints += rewardForADFC;
 
     return pair<string, long>(gameState, cpuPoints - playerPoints);
 }
