@@ -5,21 +5,21 @@ using namespace std;
 
 void MiniMaxCheckers::runAllTests()
 {
-    testStaticEval();
+    // testStaticEval();
 
-    testToIndex();
+    // testToIndex();
 
-    testIsOnBoard();
+    // testIsOnBoard();
 
-    testIsFieldEmpty();
+    // testIsFieldEmpty();
 
-    testCalcCaptureCoords();
+    // testCalcCaptureCoords();
 
-    testIsDiagonalTo();
+    // testIsDiagonalTo();
 
-    testPawnCapture();
+    // testPawnCapture();
 
-    testPawnMove();
+    // testPawnMove();
 
     testBuildFieldChildren();
 

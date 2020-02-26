@@ -132,8 +132,8 @@ private:
                          const FieldCoords &direction,
                          const FieldCoords &startCoords);
 
-    std::list<std::string> crownheadCapture(const std::string& gameState,
-                                            const FieldCoords& coords,
+    std::set<std::string> crownheadCapture(const std::string &gameState,
+                                            const FieldCoords &coords,
                                             bool maximizingPlayer);
 
     std::list<std::string> crownheadMove(const std::string &gameState,
