@@ -30,6 +30,10 @@ void Board::build()
             if (isFieldValid(Vector2u(x, y)))
                 fieldColor = Color::Black;
 
+            m_fieldRects.emplace_back(ClickableRect(
+                Vector2f(x * m_fieldEdgeLength, y * m_fieldEdgeLength),
+                Vector2f(m_fieldEdgeLength, m_fieldEdgeLength)));
+
             // Pointer to current quad
             Vertex *quad = &m_vertices[(y * m_boardSize + x) * 4];
 
@@ -72,4 +76,42 @@ bool Board::isFieldValid(const sf::Vector2u &fieldCoords)
     uint8_t x = fieldCoords.x;
     uint8_t y = fieldCoords.y;
     return (y % 2 == 0 && x % 2 != 0) || (y % 2 != 0 && x % 2 == 0);
+}
+
+void Board::changeFieldColor(const sf::Vector2u &fieldCoords, const sf::Color &color)
+{
+    if (fieldCoords.x < m_boardSize && fieldCoords.y < m_boardSize)
+    {
+        Vertex *quad = &m_vertices[(fieldCoords.y * m_boardSize + fieldCoords.x) * 4];
+
+        for (uint8_t i = 0; i < 4; i++)
+            quad[i].color = color;
+    }
+}
+
+sf::Color Board::getFieldColor(const sf::Vector2u &fieldCoords)
+{
+    if (fieldCoords.x < m_boardSize && fieldCoords.y < m_boardSize)
+    {
+        Vertex *quad = &m_vertices[(fieldCoords.y * m_boardSize + fieldCoords.x) * 4];
+        return quad[0].color;
+    }
+
+    return Color::Yellow;
+}
+
+sf::Vector2u Board::getClickedCoords(const Vector2i &mousePos)
+{
+
+    for (uint8_t y = 0; y < m_boardSize; y++)
+    {
+        for (uint8_t x = 0; x < m_boardSize; x++)
+        {
+            if (m_fieldRects[y * m_boardSize + x].clicked(mousePos))
+                return Vector2u(x, y);
+        }
+    }
+
+    // (8, 8) is out of board
+    return Vector2u(8, 8);
 }

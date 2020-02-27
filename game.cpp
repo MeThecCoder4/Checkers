@@ -1,5 +1,6 @@
 #include "game.h"
 #include "new"
+#include <iostream>
 
 using namespace sf;
 using namespace Checkers;
@@ -16,16 +17,20 @@ Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
     m_board.setFieldEdgeLength(windowSize.x);
     m_board.build();
 
-    m_gameState = "02020202"
-                  "20202020"
+    m_gameState = "01010101"
+                  "10101010"
                   "00000000"
                   "00000000"
                   "00000000"
                   "00000000"
-                  "01010101"
-                  "10101010";
+                  "02020202"
+                  "20202020";
 
     initFiguresFrom(m_gameState);
+
+    m_prevTargetField = Vector2u(0, 0);
+    m_prevTargetColor = m_board.getFieldColor(m_prevTargetField);
+
     mainLoop();
 }
 
@@ -46,6 +51,9 @@ bool Game::initGameWindow(const sf::Vector2u &windowSize)
 
         m_window = new RenderWindow(VideoMode(windowSize.x, windowSize.y),
                                     "Checkers", Style::Close | Style::Titlebar, settings);
+
+        m_window->setFramerateLimit(30);
+        m_window->setVerticalSyncEnabled(true);
     }
     catch (const std::bad_alloc &e)
     {
@@ -69,6 +77,7 @@ void Game::mainLoop()
 
         m_window->clear(Color::Black);
         m_window->draw(m_board);
+        mouseEvents();
         drawFigures();
         m_window->display();
     }
@@ -94,13 +103,13 @@ void Game::initFiguresFrom(const std::string &gameState)
                     // CPU pawn
                     case '1':
                         m_figures.emplace_back(new Pawn(position,
-                                                        (m_whitePlayer ? Color(127, 51, 0) : Color::White),
+                                                        (m_whitePlayer ? Color::Red : Color::White),
                                                         figureRadius));
                         break;
                     // Player pawn
                     case '2':
                         m_figures.emplace_back(new Pawn(position,
-                                                        (m_whitePlayer ? Color::White : Color(127, 51, 0)),
+                                                        (m_whitePlayer ? Color::White : Color::Red),
                                                         figureRadius));
                         break;
                     // CPU crownhead
@@ -120,4 +129,12 @@ void Game::drawFigures()
 {
     for (const auto &figure : m_figures)
         m_window->draw(figure->getShape());
+}
+
+void Game::mouseEvents()
+{
+    Vector2u fieldCoords = m_board.getClickedCoords(Mouse::getPosition(*m_window));
+
+    if (fieldCoords != Vector2u(8, 8))
+        std::cout << "Field coords: (" << fieldCoords.x << ", " << fieldCoords.y << ")" << std::endl;
 }

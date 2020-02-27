@@ -362,7 +362,7 @@ void MiniMaxCheckers::makeCrownheads(std::string &gameState)
         if (gameState[coords.toIndex()] == m_figures.playerPawn)
             gameState[coords.toIndex()] = m_figures.playerCrownhead;
     }
-}
+} 
 
 std::list<std::string> MiniMaxCheckers::crownheadMove(const std::string &gameState,
                                                       const FieldCoords &coords)

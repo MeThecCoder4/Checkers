@@ -27,6 +27,8 @@ private:
 
     void drawFigures();
 
+    void mouseEvents();
+
     bool m_whitePlayer;
 
     sf::RenderWindow *m_window;
@@ -36,6 +38,10 @@ private:
     std::vector<Figure *> m_figures;
 
     Board m_board;
+
+    sf::Vector2u m_prevTargetField;
+
+    sf::Color m_prevTargetColor;
 };
 }; // namespace Checkers
 

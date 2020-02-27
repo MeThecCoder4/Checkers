@@ -2,6 +2,8 @@
 #define BOARD_H
 
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include "clickablerect.h"
 
 namespace Checkers
 {
@@ -22,16 +24,25 @@ public:
 
     uint8_t getBoardSize() const;
 
-    static bool isFieldValid(const sf::Vector2u& fieldCoords);
+    static bool isFieldValid(const sf::Vector2u &fieldCoords);
+
+    void changeFieldColor(const sf::Vector2u &fieldCoords, const sf::Color &color);
+
+    sf::Color getFieldColor(const sf::Vector2u &fieldCoords);
+
+    sf::Vector2u getClickedCoords(const sf::Vector2i& mousePos);
 
 private:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
     sf::VertexArray m_vertices;
 
+    std::vector<ClickableRect> m_fieldRects;
+
     float m_fieldEdgeLength;
 
     const uint8_t m_boardSize = 8;
+
 };
 }; // namespace Checkers
 
