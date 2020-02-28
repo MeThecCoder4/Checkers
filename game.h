@@ -29,6 +29,10 @@ private:
 
     void mouseEvents();
 
+    void selectOnClick(const sf::Vector2u &clickedCoords);
+
+    bool isMovable(const sf::Vector2u &clickedCoords);
+
     bool m_whitePlayer;
 
     sf::RenderWindow *m_window;
@@ -38,6 +42,8 @@ private:
     std::vector<Figure *> m_figures;
 
     Board m_board;
+
+    Figure* m_lastSelected;
 
 };
 }; // namespace Checkers

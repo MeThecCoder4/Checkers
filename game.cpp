@@ -6,7 +6,7 @@ using namespace sf;
 using namespace Checkers;
 
 Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
-    : m_whitePlayer(whitePlayer)
+    : m_whitePlayer(whitePlayer), m_lastSelected(nullptr)
 {
     if (windowSize.x != windowSize.y)
         throw "Window shape has to be a square!";
@@ -83,9 +83,9 @@ void Game::initFiguresFrom(const std::string &gameState)
 {
     if (m_figures.size() == 0)
     {
-        for (uint8_t y = 0; y < m_board.getBoardSize(); y++)
+        for (uint8_t y = 0; y < Board::getBoardSize(); y++)
         {
-            for (uint8_t x = 0; x < m_board.getBoardSize(); x++)
+            for (uint8_t x = 0; x < Board::getBoardSize(); x++)
             {
                 if (Board::isFieldValid(Vector2u(x, y)))
                 {
@@ -94,25 +94,21 @@ void Game::initFiguresFrom(const std::string &gameState)
 
                     float figureRadius = (m_board.getFieldEdgeLength() / 2) - 5.0f;
 
-                    switch (gameState[y * m_board.getBoardSize() + x])
+                    switch (gameState[y * Board::getBoardSize() + x])
                     {
-                    // CPU pawn
-                    case '1':
+                    case Board::Symbols::OpponentPawn:
                         m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
                                                         (m_whitePlayer ? Color::Red : Color::White),
-                                                        figureRadius));
+                                                        figureRadius, Board::Symbols::OpponentPawn));
                         break;
-                    // Player pawn
-                    case '2':
+                    case Board::Symbols::MyPawn:
                         m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
                                                         (m_whitePlayer ? Color::White : Color::Red),
-                                                        figureRadius));
+                                                        figureRadius, Board::Symbols::MyPawn));
                         break;
-                    // CPU crownhead
-                    case '3':
+                    case Board::Symbols::OpponentCrownhead:
                         break;
-                    // Player crownhead
-                    case '4':
+                    case Board::Symbols::MyCrownhead:
                         break;
                     }
                 }
@@ -129,8 +125,55 @@ void Game::drawFigures()
 
 void Game::mouseEvents()
 {
-    Vector2u fieldCoords = m_board.getClickedCoords(Mouse::getPosition(*m_window));
+    Vector2u clickedCoords = m_board.getClickedCoords(Mouse::getPosition(*m_window));
 
-    if (fieldCoords != Vector2u(8, 8))
-        std::cout << "Field coords: (" << fieldCoords.x << ", " << fieldCoords.y << ")" << std::endl;
+    if (clickedCoords != Vector2u(8, 8))
+    {
+        // Select figure on click
+        if (Board::isFieldValid(clickedCoords))
+        {
+            if (isMovable(clickedCoords))
+            {
+                selectOnClick(clickedCoords);
+            }
+        }
+
+        std::cout << "Clicked coords: (" << clickedCoords.x << ", " << clickedCoords.y << ")" << std::endl;
+
+        if (m_lastSelected != nullptr)
+        {
+            Vector2u lsCoords = m_lastSelected->getBoardCoords();
+            std::cout << "Last selected: (" << lsCoords.x << ", " << lsCoords.y << ")" << std::endl;
+        }
+    }
+}
+
+void Game::selectOnClick(const Vector2u &clickedCoords)
+{
+    for (auto &figure : m_figures)
+    {
+        if (figure->getBoardCoords() == clickedCoords)
+        {
+            if (m_lastSelected != nullptr)
+                m_lastSelected->unselect();
+
+            figure->select();
+            m_lastSelected = figure;
+        }
+    }
+}
+
+bool Game::isMovable(const sf::Vector2u &clickedCoords)
+{
+    for (const auto &figure : m_figures)
+    {
+        if (figure->getBoardCoords() == clickedCoords &&
+            (figure->getBoardSymbol() == Board::Symbols::MyPawn ||
+             figure->getBoardSymbol() == Board::Symbols::MyCrownhead))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

@@ -66,7 +66,7 @@ void Board::setFieldEdgeLength(const int windowEdgeLength)
     m_fieldEdgeLength = windowEdgeLength / m_boardSize;
 }
 
-uint8_t Board::getBoardSize() const
+uint8_t Board::getBoardSize()
 {
     return m_boardSize;
 }

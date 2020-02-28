@@ -23,14 +23,23 @@ public:
 
     void build();
 
-    uint8_t getBoardSize() const;
-
     sf::Vector2u getClickedCoords(const sf::Vector2i &mousePos);
 
     static bool isFieldValid(const sf::Vector2u &fieldCoords);
 
     static bool isFieldEmpty(const std::vector<Figure *> &figures,
                              const sf::Vector2u &fieldCoords);
+
+    static uint8_t getBoardSize();
+
+    enum Symbols
+    {
+        EmptyField = '0',
+        OpponentPawn = '1',
+        MyPawn = '2',
+        OpponentCrownhead = '3',
+        MyCrownhead = '4'
+    };
 
 private:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -41,7 +50,7 @@ private:
 
     float m_fieldEdgeLength;
 
-    const uint8_t m_boardSize = 8;
+    static const uint8_t m_boardSize = 8;
 };
 }; // namespace Checkers
 

@@ -12,11 +12,15 @@ public:
     Pawn() = default;
 
     Pawn(const sf::Vector2f &position, const sf::Vector2u &boardCoords,
-         const sf::Color &color, const float radius);
+         const sf::Color &color, const float radius, const char boardSymbol);
 
-    void move() override;
+    Figure *move(std::string &gameState,
+                 const sf::Vector2u &destFieldCoords,
+                 const std::vector<Figure *> &figures) override;
 
-    void jump() override;
+    Figure *jump(std::string &gameState,
+                 const sf::Vector2u &destFieldCoords,
+                 const std::vector<Figure *> &figures) override;
 
     ~Pawn() {}
 
