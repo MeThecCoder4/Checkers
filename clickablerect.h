@@ -21,6 +21,9 @@ private:
 
     bool m_releasedIn;
 
+    sf::Time m_lastClick;
+
+    sf::Clock m_timePassed;
 };
 } // namespace Checkers
 

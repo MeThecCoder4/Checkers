@@ -27,10 +27,6 @@ Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
                   "20202020";
 
     initFiguresFrom(m_gameState);
-
-    m_prevTargetField = Vector2u(0, 0);
-    m_prevTargetColor = m_board.getFieldColor(m_prevTargetField);
-
     mainLoop();
 }
 
@@ -102,13 +98,13 @@ void Game::initFiguresFrom(const std::string &gameState)
                     {
                     // CPU pawn
                     case '1':
-                        m_figures.emplace_back(new Pawn(position,
+                        m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
                                                         (m_whitePlayer ? Color::Red : Color::White),
                                                         figureRadius));
                         break;
                     // Player pawn
                     case '2':
-                        m_figures.emplace_back(new Pawn(position,
+                        m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
                                                         (m_whitePlayer ? Color::White : Color::Red),
                                                         figureRadius));
                         break;

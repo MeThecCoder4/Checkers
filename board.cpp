@@ -78,28 +78,6 @@ bool Board::isFieldValid(const sf::Vector2u &fieldCoords)
     return (y % 2 == 0 && x % 2 != 0) || (y % 2 != 0 && x % 2 == 0);
 }
 
-void Board::changeFieldColor(const sf::Vector2u &fieldCoords, const sf::Color &color)
-{
-    if (fieldCoords.x < m_boardSize && fieldCoords.y < m_boardSize)
-    {
-        Vertex *quad = &m_vertices[(fieldCoords.y * m_boardSize + fieldCoords.x) * 4];
-
-        for (uint8_t i = 0; i < 4; i++)
-            quad[i].color = color;
-    }
-}
-
-sf::Color Board::getFieldColor(const sf::Vector2u &fieldCoords)
-{
-    if (fieldCoords.x < m_boardSize && fieldCoords.y < m_boardSize)
-    {
-        Vertex *quad = &m_vertices[(fieldCoords.y * m_boardSize + fieldCoords.x) * 4];
-        return quad[0].color;
-    }
-
-    return Color::Yellow;
-}
-
 sf::Vector2u Board::getClickedCoords(const Vector2i &mousePos)
 {
 
@@ -114,4 +92,16 @@ sf::Vector2u Board::getClickedCoords(const Vector2i &mousePos)
 
     // (8, 8) is out of board
     return Vector2u(8, 8);
+}
+
+bool Board::isFieldEmpty(const std::vector<Figure *> &figures,
+                         const sf::Vector2u &fieldCoords)
+{
+    for (const auto &figure : figures)
+    {
+        if (figure->getBoardCoords() == fieldCoords)
+            return false;
+    }
+
+    return true;
 }

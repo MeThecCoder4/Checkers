@@ -39,9 +39,6 @@ private:
 
     Board m_board;
 
-    sf::Vector2u m_prevTargetField;
-
-    sf::Color m_prevTargetColor;
 };
 }; // namespace Checkers
 
