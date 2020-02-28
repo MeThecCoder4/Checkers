@@ -18,7 +18,7 @@ public:
                  const sf::Vector2u &destFieldCoords,
                  const std::vector<Figure *> &figures) override;
 
-    Figure *jump(std::string &gameState,
+    sf::Vector2u jump(std::string &gameState,
                  const sf::Vector2u &destFieldCoords,
                  const std::vector<Figure *> &figures) override;
 
@@ -28,7 +28,8 @@ private:
     bool isMoveValid(const sf::Vector2u &fieldCoords,
                      const std::vector<Figure *> &figures);
 
-    bool isJumpValid(const sf::Vector2u &fieldCoords,
+    bool isJumpValid(const std::string &gameState,
+                     const sf::Vector2u &fieldCoords,
                      const std::vector<Figure *> &figures);
 };
 } // namespace Checkers

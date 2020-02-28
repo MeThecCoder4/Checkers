@@ -10,15 +10,15 @@ class Figure
 public:
     sf::CircleShape getShape();
 
-    void setPosition(const sf::Vector2f& position);
+    void setPosition(const sf::Vector2f &position);
 
     virtual Figure *move(std::string &gameState,
                          const sf::Vector2u &destFieldCoords,
                          const std::vector<Figure *> &figures) = 0;
 
-    virtual Figure *jump(std::string &gameState,
-                         const sf::Vector2u &destFieldCoords,
-                         const std::vector<Figure *> &figures) = 0;
+    virtual sf::Vector2u jump(std::string &gameState,
+                              const sf::Vector2u &destFieldCoords,
+                              const std::vector<Figure *> &figures) = 0;
 
     virtual ~Figure(){};
 

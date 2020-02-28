@@ -1,6 +1,8 @@
 #include "game.h"
 #include "new"
 #include <iostream>
+#include "minimaxcheckers.h"
+#include <algorithm>
 
 using namespace std;
 using namespace sf;
@@ -27,7 +29,12 @@ Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
                   "02020202"
                   "20202020";
 
-    initFiguresFrom(m_gameState);
+    if (whitePlayer == true)
+        m_playerTurn = true;
+    else
+        m_playerTurn = false;
+
+    buildFiguresFrom(m_gameState);
     mainLoop();
 }
 
@@ -74,44 +81,49 @@ void Game::mainLoop()
 
         m_window->clear(Color::Black);
         m_window->draw(m_board);
-        mouseEvents();
+        resolveRound();
         drawFigures();
         m_window->display();
     }
 }
 
-void Game::initFiguresFrom(const std::string &gameState)
+void Game::buildFiguresFrom(const std::string &gameState)
 {
-    if (m_figures.size() == 0)
+    if (m_figures.size() > 0)
     {
-        for (uint8_t y = 0; y < Board::getBoardSize(); y++)
+        for (const auto &figure : m_figures)
+            delete figure;
+
+        m_figures.clear();
+    }
+
+    for (uint8_t y = 0; y < Board::getBoardSize(); y++)
+    {
+        for (uint8_t x = 0; x < Board::getBoardSize(); x++)
         {
-            for (uint8_t x = 0; x < Board::getBoardSize(); x++)
+            if (Board::isFieldValid(Vector2u(x, y)))
             {
-                if (Board::isFieldValid(Vector2u(x, y)))
+                Vector2f position(x * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2),
+                                  y * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2));
+
+                float figureRadius = (m_board.getFieldEdgeLength() / 2) - 5.0f;
+
+                switch (gameState[y * Board::getBoardSize() + x])
                 {
-                    Vector2f position(x * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2),
-                                      y * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2));
-
-                    float figureRadius = (m_board.getFieldEdgeLength() / 2) - 5.0f;
-
-                    switch (gameState[y * Board::getBoardSize() + x])
-                    {
-                    case Board::Symbols::OpponentPawn:
-                        m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
-                                                        (m_whitePlayer ? Color::Red : Color::White),
-                                                        figureRadius, Board::Symbols::OpponentPawn));
-                        break;
-                    case Board::Symbols::MyPawn:
-                        m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
-                                                        (m_whitePlayer ? Color::White : Color::Red),
-                                                        figureRadius, Board::Symbols::MyPawn));
-                        break;
-                    case Board::Symbols::OpponentCrownhead:
-                        break;
-                    case Board::Symbols::MyCrownhead:
-                        break;
-                    }
+                case Board::Symbols::OpponentPawn:
+                    m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
+                                                    (m_whitePlayer ? Color::Red : Color::White),
+                                                    figureRadius, Board::Symbols::OpponentPawn));
+                    break;
+                case Board::Symbols::MyPawn:
+                    m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
+                                                    (m_whitePlayer ? Color::White : Color::Red),
+                                                    figureRadius, Board::Symbols::MyPawn));
+                    break;
+                case Board::Symbols::OpponentCrownhead:
+                    break;
+                case Board::Symbols::MyCrownhead:
+                    break;
                 }
             }
         }
@@ -138,15 +150,34 @@ void Game::mouseEvents()
             {
                 selectOnClick(clickedCoords);
             }
-            // If no figure was clicked - move already selected
+            // If no figure was clicked - move or jump already selected figure
             else
             {
                 if (m_lastSelected != nullptr)
                 {
-                    if (m_lastSelected->move(m_gameState, clickedCoords,
-                                             m_figures) != nullptr)
+                    Vector2i direction(clickedCoords.x - m_lastSelected->getBoardCoords().x,
+                                       clickedCoords.y - m_lastSelected->getBoardCoords().y);
+
+                    if (abs(direction.x) == 2 && abs(direction.y) == 2)
                     {
-                        moveFigure(*m_lastSelected, clickedCoords);
+                        Vector2u opponentCoords;
+
+                        if ((opponentCoords = m_lastSelected->jump(m_gameState, clickedCoords,
+                                                                   m_figures)) != Vector2u(8, 8))
+                        {
+                            moveFigure(*m_lastSelected, clickedCoords);
+                            removeFigureAt(opponentCoords);
+                            m_playerTurn = false;
+                        }
+                    }
+                    else
+                    {
+                        if (m_lastSelected->move(m_gameState, clickedCoords,
+                                                 m_figures) != nullptr)
+                        {
+                            moveFigure(*m_lastSelected, clickedCoords);
+                            m_playerTurn = false;
+                        }
                     }
                 }
             }
@@ -197,4 +228,41 @@ void Game::moveFigure(Figure &figure, const sf::Vector2u &destinationCoords)
     Vector2f newPosition(destinationCoords.x * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2),
                          destinationCoords.y * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2));
     figure.setPosition(newPosition);
+}
+
+void Game::resolveRound()
+{
+    if (m_playerTurn == false)
+    {
+        MiniMaxCheckers mmc(Board::Symbols::EmptyField,
+                            Board::Symbols::OpponentPawn,
+                            Board::Symbols::MyPawn,
+                            Board::Symbols::OpponentCrownhead,
+                            Board::Symbols::MyCrownhead);
+        string revGameState = m_gameState;
+        // CPU analyzes states upside - down
+        reverse(revGameState.begin(), revGameState.end());
+        string opponentResponse = mmc.search(revGameState, 10, LONG_MIN, LONG_MAX, true).first;
+        reverse(opponentResponse.begin(), opponentResponse.end());
+        m_gameState = opponentResponse;
+        buildFiguresFrom(m_gameState);
+        m_playerTurn = true;
+    }
+    else
+        mouseEvents();
+}
+
+bool Game::removeFigureAt(const sf::Vector2u &coords)
+{
+    for (auto it = m_figures.begin(); it < m_figures.end(); it++)
+    {
+        if ((*it)->getBoardCoords() == coords)
+        {
+            delete (*it);
+            m_figures.erase(it);
+            return true;
+        }
+    }
+
+    return false;
 }

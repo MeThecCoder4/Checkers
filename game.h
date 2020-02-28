@@ -23,7 +23,7 @@ private:
 
     bool initGameWindow(const sf::Vector2u &windowSize);
 
-    void initFiguresFrom(const std::string &gameState);
+    void buildFiguresFrom(const std::string &gameState);
 
     void drawFigures();
 
@@ -33,9 +33,13 @@ private:
 
     bool isMovable(const sf::Vector2u &clickedCoords);
 
+    bool removeFigureAt(const sf::Vector2u& coords);
+
     bool m_whitePlayer;
 
     void moveFigure(Figure& figure, const sf::Vector2u& destinationCoords);
+
+    void resolveRound();
 
     sf::RenderWindow *m_window;
 
@@ -46,6 +50,8 @@ private:
     Board m_board;
 
     Figure* m_lastSelected;
+
+    bool m_playerTurn;
 
 };
 }; // namespace Checkers
