@@ -1,5 +1,6 @@
 #include "pawn.h"
 #include "board.h"
+#include <iostream>
 
 using namespace sf;
 using namespace Checkers;
@@ -20,11 +21,12 @@ Figure *Pawn::move(std::string &gameState,
                    const sf::Vector2u &destFieldCoords,
                    const std::vector<Figure *> &figures)
 {
-    if (isMoveValid(destFieldCoords, figures))
+    if (isMoveValid(destFieldCoords, figures) && isSelected())
     {
         gameState[destFieldCoords.y * Board::getBoardSize() + destFieldCoords.x] = m_boardSymbol;
         gameState[m_boardCoords.y * Board::getBoardSize() + m_boardCoords.x] = Board::Symbols::EmptyField;
         m_boardCoords = destFieldCoords;
+        unselect();
         return this;
     }
 
@@ -47,7 +49,7 @@ bool Pawn::isMoveValid(const sf::Vector2u &fieldCoords,
 
         if (abs(direction.x) == 1 && abs(direction.y) == 1)
         {
-            if (direction.y < fieldCoords.y)
+            if (direction.y < 0)
             {
                 return true;
             }

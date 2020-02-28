@@ -2,6 +2,7 @@
 #include "new"
 #include <iostream>
 
+using namespace std;
 using namespace sf;
 using namespace Checkers;
 
@@ -127,14 +128,27 @@ void Game::mouseEvents()
 {
     Vector2u clickedCoords = m_board.getClickedCoords(Mouse::getPosition(*m_window));
 
+    // (8, 8) is out of board
     if (clickedCoords != Vector2u(8, 8))
     {
-        // Select figure on click
         if (Board::isFieldValid(clickedCoords))
         {
+            // Select figure on click
             if (isMovable(clickedCoords))
             {
                 selectOnClick(clickedCoords);
+            }
+            // If no figure was clicked - move already selected
+            else
+            {
+                if (m_lastSelected != nullptr)
+                {
+                    if (m_lastSelected->move(m_gameState, clickedCoords,
+                                             m_figures) != nullptr)
+                    {
+                        moveFigure(*m_lastSelected, clickedCoords);
+                    }
+                }
             }
         }
 
@@ -176,4 +190,11 @@ bool Game::isMovable(const sf::Vector2u &clickedCoords)
     }
 
     return false;
+}
+
+void Game::moveFigure(Figure &figure, const sf::Vector2u &destinationCoords)
+{
+    Vector2f newPosition(destinationCoords.x * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2),
+                         destinationCoords.y * m_board.getFieldEdgeLength() + (m_board.getFieldEdgeLength() / 2));
+    figure.setPosition(newPosition);
 }

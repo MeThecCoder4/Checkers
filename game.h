@@ -35,6 +35,8 @@ private:
 
     bool m_whitePlayer;
 
+    void moveFigure(Figure& figure, const sf::Vector2u& destinationCoords);
+
     sf::RenderWindow *m_window;
 
     std::string m_gameState;

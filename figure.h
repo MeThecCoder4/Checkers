@@ -10,6 +10,8 @@ class Figure
 public:
     sf::CircleShape getShape();
 
+    void setPosition(const sf::Vector2f& position);
+
     virtual Figure *move(std::string &gameState,
                          const sf::Vector2u &destFieldCoords,
                          const std::vector<Figure *> &figures) = 0;
@@ -25,8 +27,6 @@ public:
     sf::Vector2u getBoardCoords() const;
 
     void setBoardCoords(const sf::Vector2u &coords);
-
-    void setPosition(const sf::Vector2f &position);
 
     char getBoardSymbol();
 
