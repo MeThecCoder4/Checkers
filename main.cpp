@@ -1,5 +1,6 @@
 #include <iostream>
 #include "game.h"
+#include "pawn.h"
 
 using namespace std;
 using namespace Checkers;
@@ -43,14 +44,17 @@ int main()
     //     cout << "Static evaluation: " << startState.second << endl << endl;
     // }
 
-    try
-    {
-        Game game(true);
-    }
-    catch(const char* e)
-    {
-        cout << e << endl;
-    }
+    Pawn pawn;
+    pawn.runAllTests();
+
+    // try
+    // {
+    //     Game game(true);
+    // }
+    // catch(const char* e)
+    // {
+    //     cout << e << endl;
+    // }
 
     return 0;
 }

@@ -30,7 +30,16 @@ public:
     static bool isFieldEmpty(const std::vector<Figure *> &figures,
                              const sf::Vector2u &fieldCoords);
 
+    static bool isFieldEmpty(const std::string &gameState,
+                             const sf::Vector2u &coords);
+
+    static bool isOnBoard(const sf::Vector2u &coords);
+
     static uint8_t getBoardSize();
+
+    static uint8_t toIndex(const sf::Vector2u& coords);
+
+    static uint8_t emptyFieldsNo(const std::string& gameState);
 
     enum Symbols
     {
@@ -40,6 +49,8 @@ public:
         OpponentCrownhead = '3',
         MyCrownhead = '4'
     };
+
+    static std::string gameState;
 
 private:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;

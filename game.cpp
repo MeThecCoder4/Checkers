@@ -1,5 +1,5 @@
 #include "game.h"
-#include "new"
+#include <new>
 #include <iostream>
 #include "minimaxcheckers.h"
 #include <algorithm>
@@ -20,21 +20,12 @@ Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
     m_board.setFieldEdgeLength(windowSize.x);
     m_board.build();
 
-    m_gameState = "01010101"
-                  "10101010"
-                  "00000000"
-                  "00000000"
-                  "00000000"
-                  "00000000"
-                  "02020202"
-                  "20202020";
-
     if (whitePlayer == true)
         m_playerTurn = true;
     else
         m_playerTurn = false;
 
-    buildFiguresFrom(m_gameState);
+    buildFiguresFrom(Board::gameState);
     mainLoop();
 }
 
@@ -145,12 +136,12 @@ void Game::mouseEvents()
     {
         if (Board::isFieldValid(clickedCoords))
         {
-            // Select figure on click
+            // Select figure for the next move on click
             if (isMovable(clickedCoords))
             {
                 selectOnClick(clickedCoords);
             }
-            // If no figure was clicked - move or jump already selected figure
+            // Clicked on an empty field - move or jump
             else
             {
                 if (m_lastSelected != nullptr)
@@ -162,18 +153,18 @@ void Game::mouseEvents()
                     {
                         Vector2u opponentCoords;
 
-                        if ((opponentCoords = m_lastSelected->jump(m_gameState, clickedCoords,
-                                                                   m_figures)) != Vector2u(8, 8))
-                        {
-                            moveFigure(*m_lastSelected, clickedCoords);
-                            removeFigureAt(opponentCoords);
-                            m_playerTurn = false;
-                        }
+                        // if ((opponentCoords = m_lastSelected->jump(Board::gameState, clickedCoords,
+                        //                                            m_figures)) != Vector2u(8, 8))
+                        // {
+                        //     moveFigure(*m_lastSelected, clickedCoords);
+                        //     removeFigureAt(opponentCoords);
+
+                        //     m_playerTurn = false;
+                        // }
                     }
                     else
                     {
-                        if (m_lastSelected->move(m_gameState, clickedCoords,
-                                                 m_figures) != nullptr)
+                        if (m_lastSelected->move(Board::gameState, clickedCoords, m_figures) != nullptr)
                         {
                             moveFigure(*m_lastSelected, clickedCoords);
                             m_playerTurn = false;
@@ -239,13 +230,13 @@ void Game::resolveRound()
                             Board::Symbols::MyPawn,
                             Board::Symbols::OpponentCrownhead,
                             Board::Symbols::MyCrownhead);
-        string revGameState = m_gameState;
+        string revGameState = Board::gameState;
         // CPU analyzes states upside - down
         reverse(revGameState.begin(), revGameState.end());
-        string opponentResponse = mmc.search(revGameState, 10, LONG_MIN, LONG_MAX, true).first;
+        string opponentResponse = mmc.search(revGameState, 6, LONG_MIN, LONG_MAX, true).first;
         reverse(opponentResponse.begin(), opponentResponse.end());
-        m_gameState = opponentResponse;
-        buildFiguresFrom(m_gameState);
+        Board::gameState = opponentResponse;
+        buildFiguresFrom(Board::gameState);
         m_playerTurn = true;
     }
     else

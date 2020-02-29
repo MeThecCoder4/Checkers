@@ -43,8 +43,6 @@ private:
 
     sf::RenderWindow *m_window;
 
-    std::string m_gameState;
-
     std::vector<Figure *> m_figures;
 
     Board m_board;

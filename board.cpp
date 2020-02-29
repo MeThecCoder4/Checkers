@@ -3,6 +3,15 @@
 using namespace sf;
 using namespace Checkers;
 
+std::string Board::gameState = "01010101"
+                               "10000010"
+                               "00000000"
+                               "00001000"
+                               "00000000"
+                               "00100000"
+                               "02020202"
+                               "20202020";
+
 Board::Board(const sf::Vector2u &windowSize)
 {
     m_fieldEdgeLength = windowSize.x / m_boardSize;
@@ -104,4 +113,44 @@ bool Board::isFieldEmpty(const std::vector<Figure *> &figures,
     }
 
     return true;
+}
+
+bool Board::isFieldEmpty(const std::string &gameState,
+                         const sf::Vector2u &coords)
+{
+    if (coords.x >= 0 && coords.y >= 0 &&
+        coords.x < m_boardSize && coords.y < m_boardSize)
+    {
+        return gameState[coords.y * m_boardSize + coords.x] == Symbols::EmptyField;
+    }
+
+    return false;
+}
+
+bool Board::isOnBoard(const sf::Vector2u &coords)
+{
+    return coords.x >= 0 && coords.y >= 0 &&
+           coords.x < m_boardSize && coords.y < m_boardSize;
+}
+
+uint8_t Board::toIndex(const sf::Vector2u& coords)
+{
+    return coords.y * m_boardSize + coords.x;
+}
+
+uint8_t Board::emptyFieldsNo(const std::string& gameState)
+{
+    uint8_t counter = 0;
+    Vector2u coords;
+
+    for(coords.y = 0; coords.y < m_boardSize; coords.y++)
+    {
+        for(coords.x = 0; coords.x < m_boardSize; coords.x++)
+        {
+            if(isFieldValid(coords) && isFieldEmpty(gameState, coords))
+                counter++;
+        }
+    }
+
+    return counter;
 }

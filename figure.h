@@ -2,6 +2,7 @@
 #define FIGURE_H
 
 #include <SFML/Graphics.hpp>
+#include <list>
 
 namespace Checkers
 {
@@ -40,6 +41,9 @@ protected:
     Figure() = default;
 
     explicit Figure(const sf::Vector2u &boardCoords, const char boardSymbol);
+
+    virtual std::list<std::pair<sf::Vector2u, std::string>> getPossibleJumps(const std::string &gameState,
+                                                                             const sf::Vector2u pawnCoords) = 0;
 
     sf::Color m_color;
 
