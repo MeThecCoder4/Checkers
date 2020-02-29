@@ -17,11 +17,9 @@ public:
                          const sf::Vector2u &destFieldCoords,
                          const std::vector<Figure *> &figures) = 0;
 
-    virtual sf::Vector2u jump(std::string &gameState,
-                              const sf::Vector2u &destFieldCoords,
-                              const std::vector<Figure *> &figures) = 0;
+    virtual bool jump(const sf::Vector2u &destFieldCoords) = 0;
 
-    virtual ~Figure(){};
+    virtual ~Figure() {};
 
     sf::Vector2f getCoords() const;
 
@@ -41,9 +39,6 @@ protected:
     Figure() = default;
 
     explicit Figure(const sf::Vector2u &boardCoords, const char boardSymbol);
-
-    virtual std::list<std::pair<sf::Vector2u, std::string>> getPossibleJumps(const std::string &gameState,
-                                                                             const sf::Vector2u pawnCoords) = 0;
 
     sf::Color m_color;
 

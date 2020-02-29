@@ -17,7 +17,7 @@ public:
                              const uint8_t crownheadFactor = 2,
                              const uint8_t pawnFactor = 1);
 
-    // Test methods
+    // ~~~~~~~~~~~~~~~~~~~~~~ Test Methods ~~~~~~~~~~~~~~~~~~~~~~
     void testStaticEval();
 
     void testToIndex();
@@ -39,6 +39,9 @@ public:
     void runAllTests();
 
     void printState(const std::string &gameState);
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    std::list<std::string> getCaptureStates();
 
     static const uint8_t m_boardEdge = 8;
 
@@ -158,6 +161,8 @@ private:
     std::pair<std::string, long> getNewBestState(const std::list<std::string> &nextStates,
                                                  std::pair<std::string, long> currentBest,
                                                  bool maximizingPlayer);
+
+    std::list<std::string> m_captureStates;
 
     uint8_t m_crownheadFactor;
 

@@ -18,13 +18,9 @@ public:
                  const sf::Vector2u &destFieldCoords,
                  const std::vector<Figure *> &figures) override;
 
-    sf::Vector2u jump(std::string &gameState,
-                      const sf::Vector2u &destFieldCoords,
-                      const std::vector<Figure *> &figures) override;
+    bool jump(const sf::Vector2u &destFieldCoords) override;
 
     ~Pawn() {}
-
-    void testGetPossibleJumps();
 
     void runAllTests();
 
@@ -32,8 +28,12 @@ private:
     bool isMoveValid(const sf::Vector2u &fieldCoords,
                      const std::vector<Figure *> &figures);
 
-    std::list<std::pair<sf::Vector2u, std::string>> getPossibleJumps(const std::string &gameState,
-                                                                     const sf::Vector2u pawnCoords) override;
+    std::string isJumpValid(const sf::Vector2u &jumpCoords);
+
+    // This method computes valid capture states using minimax algorithm.
+    // It is used each time an user wants to jump, to check if that jump is indeed valid.
+    std::list<std::string> getValidJumps();
+
 };
 } // namespace Checkers
 

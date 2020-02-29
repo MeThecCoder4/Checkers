@@ -5,7 +5,7 @@ OBJS = main.o minimaxcheckers.o minimaxcheckerstest.o game.o board.o figure.o pa
 EXEC_FILE = checkers
 
 $(EXEC_FILE): $(OBJS)
-	$(CC) -o $(EXEC_FILE) $(OBJS) -lsfml-graphics -lsfml-window -lsfml-system
+	$(CC) -Wall -o $(EXEC_FILE) $(OBJS) -lsfml-graphics -lsfml-window -lsfml-system
 
 $(OBJS): $(SOURCES) $(DEPS)
 	$(CC) -c -g $(SOURCES) $(DEPS)

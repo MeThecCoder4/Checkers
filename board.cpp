@@ -4,9 +4,9 @@ using namespace sf;
 using namespace Checkers;
 
 std::string Board::gameState = "01010101"
-                               "10000010"
+                               "10101010"
                                "00000000"
-                               "00001000"
+                               "00000000"
                                "00000000"
                                "00100000"
                                "02020202"

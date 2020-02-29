@@ -1,5 +1,7 @@
 #include "figure.h"
+#include <iostream>
 
+using namespace std;
 using namespace sf;
 using namespace Checkers;
 

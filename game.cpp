@@ -149,18 +149,16 @@ void Game::mouseEvents()
                     Vector2i direction(clickedCoords.x - m_lastSelected->getBoardCoords().x,
                                        clickedCoords.y - m_lastSelected->getBoardCoords().y);
 
-                    if (abs(direction.x) == 2 && abs(direction.y) == 2)
+                    if (abs(direction.x) != 1 && abs(direction.y) != 1)
                     {
-                        Vector2u opponentCoords;
+                        if (m_lastSelected->jump(clickedCoords))
+                        {
+                            moveFigure(*m_lastSelected, clickedCoords);
+                            buildFiguresFrom(Board::gameState);
 
-                        // if ((opponentCoords = m_lastSelected->jump(Board::gameState, clickedCoords,
-                        //                                            m_figures)) != Vector2u(8, 8))
-                        // {
-                        //     moveFigure(*m_lastSelected, clickedCoords);
-                        //     removeFigureAt(opponentCoords);
-
-                        //     m_playerTurn = false;
-                        // }
+                            m_playerTurn = false;
+                            m_lastSelected = nullptr;
+                        }
                     }
                     else
                     {
@@ -168,6 +166,7 @@ void Game::mouseEvents()
                         {
                             moveFigure(*m_lastSelected, clickedCoords);
                             m_playerTurn = false;
+                            m_lastSelected = nullptr;
                         }
                     }
                 }
@@ -240,7 +239,9 @@ void Game::resolveRound()
         m_playerTurn = true;
     }
     else
+    {
         mouseEvents();
+    }
 }
 
 bool Game::removeFigureAt(const sf::Vector2u &coords)
