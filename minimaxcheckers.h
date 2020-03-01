@@ -14,8 +14,8 @@ public:
                              const char playerPawn,
                              const char cpuCrownhead,
                              const char playerCrownhead,
-                             const uint8_t crownheadFactor = 2,
-                             const uint8_t pawnFactor = 1);
+                             const uint8_t crownheadFactor = 17,
+                             const uint8_t pawnFactor = 15);
 
     // ~~~~~~~~~~~~~~~~~~~~~~ Test Methods ~~~~~~~~~~~~~~~~~~~~~~
     void testStaticEval();
@@ -35,6 +35,8 @@ public:
     void testPawnMove();
 
     void testBuildFieldChildren();
+
+    void testBuildChildren();
 
     void runAllTests();
 
@@ -118,9 +120,15 @@ private:
         }
     };
 
+    long pointsForFigures(const std::string& gameState);
+
     std::pair<std::list<std::string>, bool> buildFieldChildren(const std::string &gameState,
                                                                const FieldCoords &coords,
                                                                bool maximizingPlayer);
+
+    std::list<std::string> crownheadCapture(const std::string &gameState,
+                                       const FieldCoords &coords,
+                                       bool maximizingPlayer);
 
     std::list<std::string> pawnCapture(const std::string &gameState,
                                        const FieldCoords &coords,
@@ -129,16 +137,6 @@ private:
     std::list<std::string> pawnMove(const std::string &gameState,
                                     const FieldCoords &coords);
 
-    std::list<std::pair<std::string,
-                        MiniMaxCheckers::FieldCoords>>
-    findNewCrownCaptures(const std::string &gameState,
-                         const FieldCoords &direction,
-                         const FieldCoords &startCoords);
-
-    std::set<std::string> crownheadCapture(const std::string &gameState,
-                                            const FieldCoords &coords,
-                                            bool maximizingPlayer);
-
     std::list<std::string> crownheadMove(const std::string &gameState,
                                          const FieldCoords &coords);
 
@@ -146,8 +144,6 @@ private:
 
     // This function calculates coords of a field you move your figure to after the capture
     FieldCoords calcCaptureCoords(const FieldCoords &myCoords, const FieldCoords &opponentCoords);
-
-    bool isCoordsVisited(const std::list<FieldCoords> &list, const FieldCoords &coords);
 
     void makeCrownheads(std::string &gameState);
 
