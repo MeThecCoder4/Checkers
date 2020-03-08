@@ -21,6 +21,65 @@ MiniMaxCheckers::MiniMaxCheckers(const char emptyField,
     m_figures.playerCrownhead = playerCrownhead;
 }
 
+long MiniMaxCheckers::pointsForSafety(const std::string &gameState)
+{
+    long playerPoints = 0, cpuPoints = 0;
+    FieldCoords coords;
+
+    for (coords.y = 0; coords.y < m_boardEdge; coords.y++)
+    {
+        for (coords.x = 0; coords.x < m_boardEdge; coords.x++)
+        {
+            int penalty = 40;
+            const char figure = gameState[coords.toIndex()];
+            pair<char, char> opponents = getOpponentFigures(figure);
+            FieldCoords neighFields[4] = {FieldCoords(coords.y - 1, coords.x - 1),
+                                          FieldCoords(coords.y - 1, coords.x + 1),
+                                          FieldCoords(coords.y + 1, coords.x - 1),
+                                          FieldCoords(coords.y + 1, coords.x + 1)};
+
+            if (figure == m_figures.cpuPawn)
+            {
+                if (neighFields[0].isOnBoard() && neighFields[3].isOnBoard())
+                {
+                    if ((gameState[neighFields[0].toIndex()] == opponents.first ||
+                         gameState[neighFields[0].toIndex()] == opponents.second) &&
+                        isFieldEmpty(gameState, neighFields[3]))
+                        playerPoints += penalty;
+                }
+
+                if (neighFields[1].isOnBoard() && neighFields[2].isOnBoard())
+                {
+                    if ((gameState[neighFields[1].toIndex()] == opponents.first ||
+                         gameState[neighFields[1].toIndex()] == opponents.second) &&
+                        isFieldEmpty(gameState, neighFields[2]))
+                        playerPoints += penalty;
+                }
+            }
+            else if (figure == m_figures.playerPawn)
+            {
+                if (neighFields[0].isOnBoard() && neighFields[3].isOnBoard())
+                {
+                    if ((gameState[neighFields[3].toIndex()] == opponents.first ||
+                         gameState[neighFields[3].toIndex()] == opponents.second) &&
+                        isFieldEmpty(gameState, neighFields[0]))
+                        cpuPoints += penalty;
+                }
+
+                if (neighFields[1].isOnBoard() && neighFields[2].isOnBoard())
+                {
+                    if ((gameState[neighFields[2].toIndex()] == opponents.first ||
+                         gameState[neighFields[2].toIndex()] == opponents.second) &&
+                        isFieldEmpty(gameState, neighFields[1]))
+                        cpuPoints += penalty;
+                }
+            }
+        }
+    }
+
+    return cpuPoints - playerPoints;
+}
+
 long MiniMaxCheckers::pointsForFigures(const std::string &gameState)
 {
     long playerPoints = 0, cpuPoints = 0;
@@ -70,10 +129,8 @@ std::pair<std::string, long> MiniMaxCheckers::staticEval(std::string gameState)
 
     long points = pointsForFigures(gameState);
 
-    if(points == LONG_MAX || points == LONG_MIN)
+    if (points == LONG_MAX || points == LONG_MIN)
         return pair<string, long>(gameState, points);
-    
-
 
     return pair<string, long>(gameState, points);
 }
@@ -83,9 +140,7 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
     if (gameState.length() != m_boardEdge * m_boardEdge)
         throw "Invalid state length.";
 
-    std::list<std::string> endChildren;
-    bool capture = false;
-    list<pair<string, bool>> children;
+    list<string> children;
     FieldCoords coords;
     char pawn = m_figures.playerPawn, crownhead = m_figures.playerCrownhead;
 
@@ -116,35 +171,20 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
                     makeCrownheads(child);
 
                 if (currentFieldChildren.second)
-                    capture = true;
+                    return currentFieldChildren.first;
 
                 for (const auto &child : currentFieldChildren.first)
                 {
-                    if (currentFieldChildren.second)
-                        children.emplace_back(pair<string, bool>(child, true));
-                    else
-                        children.emplace_back(pair<string, bool>(child, false));
+                    // printState(child);
+                    // cout << staticEval(child).second << endl;
+                    // cout << endl;
+                    children.emplace_back(child);
                 }
             }
         }
     }
 
-    if (capture)
-    {
-        for (const auto &child : children)
-        {
-            if (child.second)
-            {
-                m_captureStates.emplace_back(child.first);
-                endChildren.emplace_back(child.first);
-            }
-        }
-    }
-    else
-        for (const auto &child : children)
-            endChildren.emplace_back(child.first);
-
-    return endChildren;
+    return children;
 }
 
 pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const string &gameState,
@@ -224,6 +264,7 @@ list<std::string> MiniMaxCheckers::pawnCapture(const std::string &gameState,
                     if (isFieldEmpty(childState, captureCoords))
                     {
                         updateCaptureState(childState, neighs, coords, captureCoords, figure);
+                        m_captureStates.emplace_back(childState);
 
                         // Handle multi captures with recursion
                         pair<string, long> bestState = staticEval(childState);
@@ -277,6 +318,7 @@ list<std::string> MiniMaxCheckers::crownheadCapture(const std::string &gameState
                         if (isFieldEmpty(childState, captureCoords))
                         {
                             updateCaptureState(childState, neighs, coords, captureCoords, figure);
+                            m_captureStates.emplace_back(childState);
 
                             // Handle multi captures with recursion
                             pair<string, long> bestState = staticEval(childState);
@@ -389,7 +431,11 @@ list<string> MiniMaxCheckers::pawnMove(const string &gameState,
             string childState = gameState;
             childState[coords.toIndex()] = m_figures.emptyField;
             childState[neighs[i].toIndex()] = pawn;
-            resultStates.emplace_back(childState);
+
+            // This condition fixes a bug, without it the computer starts acting like an idiot
+            if ((pawn == m_figures.cpuPawn && pointsForSafety(childState) >= -m_pawnFactor) ||
+                (pawn == m_figures.playerPawn && pointsForSafety(childState) <= m_pawnFactor))
+                resultStates.emplace_back(childState);
         }
     }
 

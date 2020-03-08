@@ -14,7 +14,7 @@ public:
                              const char playerPawn,
                              const char cpuCrownhead,
                              const char playerCrownhead,
-                             const uint8_t crownheadFactor = 17,
+                             const uint8_t crownheadFactor = 25,
                              const uint8_t pawnFactor = 15);
 
     // ~~~~~~~~~~~~~~~~~~~~~~ Test Methods ~~~~~~~~~~~~~~~~~~~~~~
@@ -119,6 +119,8 @@ private:
             return *this;
         }
     };
+
+    long pointsForSafety(const std::string &gameState);
 
     long pointsForFigures(const std::string& gameState);
 

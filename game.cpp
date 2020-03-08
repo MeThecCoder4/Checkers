@@ -232,9 +232,10 @@ void Game::resolveRound()
         string revGameState = Board::gameState;
         // CPU analyzes states upside - down
         reverse(revGameState.begin(), revGameState.end());
-        string opponentResponse = mmc.search(revGameState, 10, LONG_MIN, LONG_MAX, true).first;
-        reverse(opponentResponse.begin(), opponentResponse.end());
-        Board::gameState = opponentResponse;
+        auto opponentResponse = mmc.search(revGameState, 2, LONG_MIN, LONG_MAX, true);
+        reverse(opponentResponse.first.begin(), opponentResponse.first.end());
+        mmc.printState(opponentResponse.first);
+        Board::gameState = opponentResponse.first;
         buildFiguresFrom(Board::gameState);
         m_playerTurn = true;
     }
