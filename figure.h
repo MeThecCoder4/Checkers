@@ -9,17 +9,22 @@ namespace Checkers
 class Figure
 {
 public:
+    Figure() = default;
+
+    explicit Figure(const sf::Vector2f &position, const sf::Vector2u &boardCoords,
+                    const sf::Color &color, const float radius, const char boardSymbol, bool hasCrown = false);
+
     sf::CircleShape getShape();
 
     void setPosition(const sf::Vector2f &position);
 
-    virtual Figure *move(std::string &gameState,
-                         const sf::Vector2u &destFieldCoords,
-                         const std::vector<Figure *> &figures) = 0;
+    Figure *move(std::string &gameState,
+                 const sf::Vector2u &destFieldCoords,
+                 const std::vector<Figure *> &figures);
 
-    virtual bool jump(const sf::Vector2u &destFieldCoords) = 0;
+    bool jump(const sf::Vector2u &destFieldCoords);
 
-    virtual ~Figure() {};
+    virtual ~Figure(){};
 
     sf::Vector2f getCoords() const;
 
@@ -35,10 +40,15 @@ public:
 
     void unselect();
 
-protected:
-    Figure() = default;
+private:
+    bool isMoveValid(const sf::Vector2u &fieldCoords,
+                     const std::vector<Figure *> &figures);
 
-    explicit Figure(const sf::Vector2u &boardCoords, const char boardSymbol);
+    std::string isJumpValid(const sf::Vector2u &jumpCoords);
+
+    // This method computes valid capture states using minimax algorithm.
+    // It is used each time an user wants to jump, to check if that jump is indeed valid.
+    std::list<std::string> getValidJumps();
 
     sf::Color m_color;
 
@@ -49,6 +59,8 @@ protected:
     char m_boardSymbol;
 
     bool m_selected;
+
+    bool m_hasCrown;
 };
 } // namespace Checkers
 

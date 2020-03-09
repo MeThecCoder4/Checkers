@@ -8,8 +8,8 @@ using namespace std;
 using namespace sf;
 using namespace Checkers;
 
-Game::Game(bool whitePlayer, const sf::Vector2u &windowSize)
-    : m_whitePlayer(whitePlayer), m_lastSelected(nullptr)
+Game::Game(unsigned char difficulty, bool whitePlayer, const sf::Vector2u &windowSize)
+    : m_difficulty(difficulty), m_whitePlayer(whitePlayer), m_lastSelected(nullptr)
 {
     if (windowSize.x != windowSize.y)
         throw "Window shape has to be a square!";
@@ -102,18 +102,24 @@ void Game::buildFiguresFrom(const std::string &gameState)
                 switch (gameState[y * Board::getBoardSize() + x])
                 {
                 case Board::Symbols::OpponentPawn:
-                    m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
+                    m_figures.emplace_back(new Figure(position, Vector2u(x, y),
                                                     (m_whitePlayer ? Color::Red : Color::White),
-                                                    figureRadius, Board::Symbols::OpponentPawn));
+                                                    figureRadius, Board::Symbols::OpponentPawn, false));
                     break;
                 case Board::Symbols::MyPawn:
-                    m_figures.emplace_back(new Pawn(position, Vector2u(x, y),
+                    m_figures.emplace_back(new Figure(position, Vector2u(x, y),
                                                     (m_whitePlayer ? Color::White : Color::Red),
-                                                    figureRadius, Board::Symbols::MyPawn));
+                                                    figureRadius, Board::Symbols::MyPawn, false));
                     break;
                 case Board::Symbols::OpponentCrownhead:
+                    m_figures.emplace_back(new Figure(position, Vector2u(x, y),
+                                                         (m_whitePlayer ? Color::Red : Color::White),
+                                                         figureRadius, Board::Symbols::OpponentCrownhead, true));
                     break;
                 case Board::Symbols::MyCrownhead:
+                    m_figures.emplace_back(new Figure(position, Vector2u(x, y),
+                                                         (m_whitePlayer ? Color::White : Color::Red),
+                                                         figureRadius, Board::Symbols::MyCrownhead, true));
                     break;
                 }
             }
@@ -148,6 +154,7 @@ void Game::mouseEvents()
                 {
                     Vector2i direction(clickedCoords.x - m_lastSelected->getBoardCoords().x,
                                        clickedCoords.y - m_lastSelected->getBoardCoords().y);
+                    cout << direction.x << ", " << direction.y << endl;
 
                     if (abs(direction.x) != 1 && abs(direction.y) != 1)
                     {
@@ -232,7 +239,7 @@ void Game::resolveRound()
         string revGameState = Board::gameState;
         // CPU analyzes states upside - down
         reverse(revGameState.begin(), revGameState.end());
-        auto opponentResponse = mmc.search(revGameState, 2, LONG_MIN, LONG_MAX, true);
+        auto opponentResponse = mmc.search(revGameState, m_difficulty, LONG_MIN, LONG_MAX, true);
         reverse(opponentResponse.first.begin(), opponentResponse.first.end());
         mmc.printState(opponentResponse.first);
         Board::gameState = opponentResponse.first;

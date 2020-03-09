@@ -83,7 +83,6 @@ long MiniMaxCheckers::pointsForSafety(const std::string &gameState)
 long MiniMaxCheckers::pointsForFigures(const std::string &gameState)
 {
     long playerPoints = 0, cpuPoints = 0;
-    int playerCrowns = 0, cpuCrowns = 0;
     FieldCoords coords;
 
     for (coords.y = 0; coords.y < m_boardEdge; coords.y++)
@@ -99,7 +98,6 @@ long MiniMaxCheckers::pointsForFigures(const std::string &gameState)
             else if (figure == m_figures.playerCrownhead)
             {
                 playerPoints += m_crownheadFactor;
-                playerCrowns++;
             }
             else if (figure == m_figures.cpuPawn)
             {
@@ -108,7 +106,6 @@ long MiniMaxCheckers::pointsForFigures(const std::string &gameState)
             else if (figure == m_figures.cpuCrownhead)
             {
                 cpuPoints += m_crownheadFactor;
-                cpuCrowns++;
             }
         }
     }
@@ -140,7 +137,8 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
     if (gameState.length() != m_boardEdge * m_boardEdge)
         throw "Invalid state length.";
 
-    list<string> children;
+    list<string> captures;
+    list<string> moves;
     FieldCoords coords;
     char pawn = m_figures.playerPawn, crownhead = m_figures.playerCrownhead;
 
@@ -171,20 +169,20 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
                     makeCrownheads(child);
 
                 if (currentFieldChildren.second)
-                    return currentFieldChildren.first;
-
-                for (const auto &child : currentFieldChildren.first)
                 {
-                    // printState(child);
-                    // cout << staticEval(child).second << endl;
-                    // cout << endl;
-                    children.emplace_back(child);
+                    for (const auto &child : currentFieldChildren.first)
+                        captures.emplace_back(child);
+                }
+                else
+                {
+                    for (const auto &child : currentFieldChildren.first)
+                        moves.emplace_back(child);
                 }
             }
         }
     }
 
-    return children;
+    return (captures.size() > 0) ? captures : moves;
 }
 
 pair<std::list<std::string>, bool> MiniMaxCheckers::buildFieldChildren(const string &gameState,

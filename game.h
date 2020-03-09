@@ -4,7 +4,7 @@
 #include "minimaxcheckers.h"
 #include <SFML/Graphics.hpp>
 #include "board.h"
-#include "pawn.h"
+#include "figure.h"
 #include <vector>
 
 namespace Checkers
@@ -14,7 +14,7 @@ class Game
 public:
     Game(){};
 
-    Game(bool whitePlayer, const sf::Vector2u &windowSize = sf::Vector2u(600, 600));
+    Game(unsigned char difficulty, bool whitePlayer, const sf::Vector2u &windowSize = sf::Vector2u(600, 600));
 
     ~Game();
 
@@ -50,6 +50,8 @@ private:
     Figure* m_lastSelected;
 
     bool m_playerTurn;
+
+    unsigned char m_difficulty;
 
 };
 }; // namespace Checkers
