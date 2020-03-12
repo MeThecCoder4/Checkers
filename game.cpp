@@ -17,7 +17,7 @@ Game::Game(unsigned char difficulty, bool whitePlayer, const sf::Vector2u &windo
     if (!initGameWindow(windowSize))
         throw "Problem initializing game window - could not allocate memory.";
 
-    m_board.setFieldEdgeLength(windowSize.x);
+    m_board.setFieldEdgeLength(windowSize.x);   
     m_board.build();
 
     if (whitePlayer == true)
@@ -26,6 +26,7 @@ Game::Game(unsigned char difficulty, bool whitePlayer, const sf::Vector2u &windo
         m_playerTurn = false;
 
     buildFiguresFrom(Board::gameState);
+    m_gameState = Playing;
     mainLoop();
 }
 
@@ -71,9 +72,7 @@ void Game::mainLoop()
         }
 
         m_window->clear(Color::Black);
-        m_window->draw(m_board);
-        resolveRound();
-        drawFigures();
+        manageGameState();
         m_window->display();
     }
 }
@@ -103,23 +102,23 @@ void Game::buildFiguresFrom(const std::string &gameState)
                 {
                 case Board::Symbols::OpponentPawn:
                     m_figures.emplace_back(new Figure(position, Vector2u(x, y),
-                                                    (m_whitePlayer ? Color::Red : Color::White),
-                                                    figureRadius, Board::Symbols::OpponentPawn, false));
+                                                      (m_whitePlayer ? Color::Red : Color(230, 230, 230)),
+                                                      figureRadius, Board::Symbols::OpponentPawn, false));
                     break;
                 case Board::Symbols::MyPawn:
                     m_figures.emplace_back(new Figure(position, Vector2u(x, y),
-                                                    (m_whitePlayer ? Color::White : Color::Red),
-                                                    figureRadius, Board::Symbols::MyPawn, false));
+                                                      (m_whitePlayer ? Color(230, 230, 230): Color::Red),
+                                                      figureRadius, Board::Symbols::MyPawn, false));
                     break;
                 case Board::Symbols::OpponentCrownhead:
                     m_figures.emplace_back(new Figure(position, Vector2u(x, y),
-                                                         (m_whitePlayer ? Color::Red : Color::White),
-                                                         figureRadius, Board::Symbols::OpponentCrownhead, true));
+                                                      (m_whitePlayer ? Color::Red : Color(230, 230, 230)),
+                                                      figureRadius, Board::Symbols::OpponentCrownhead, true));
                     break;
                 case Board::Symbols::MyCrownhead:
                     m_figures.emplace_back(new Figure(position, Vector2u(x, y),
-                                                         (m_whitePlayer ? Color::White : Color::Red),
-                                                         figureRadius, Board::Symbols::MyCrownhead, true));
+                                                      (m_whitePlayer ? Color(230, 230, 230) : Color::Red),
+                                                      figureRadius, Board::Symbols::MyCrownhead, true));
                     break;
                 }
             }
@@ -265,4 +264,63 @@ bool Game::removeFigureAt(const sf::Vector2u &coords)
     }
 
     return false;
+}
+
+void Game::manageGameState()
+{
+    switch (m_gameState)
+    {
+    case Menu:
+        break;
+
+    case Playing:
+        m_window->draw(m_board);
+        resolveRound();
+        drawFigures();
+
+        switch (checkWin())
+        {
+        case MyWin:
+            m_gameState = MyWin;
+            break;
+
+        case OpponentWin:
+            m_gameState = OpponentWin;
+            break;
+        }
+        break;
+    case MyWin:
+        break;
+
+    case OpponentWin:
+        break;
+    }
+}
+
+Game::GameState Game::checkWin()
+{
+    int myFigures = 0, opponentFigures = 0;
+
+    for (const auto &figure : m_figures)
+    {
+        switch (figure->getBoardSymbol())
+        {
+        case Board::Symbols::MyCrownhead:
+        case Board::Symbols::MyPawn:
+            myFigures++;
+            break;
+
+        case Board::Symbols::OpponentCrownhead:
+        case Board::Symbols::OpponentPawn:
+            opponentFigures++;
+            break;
+        }
+    }
+
+    if (myFigures == 0)
+        return OpponentWin;
+    else if (opponentFigures == 0)
+        return MyWin;
+    else
+        return Playing;
 }

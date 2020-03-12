@@ -19,6 +19,14 @@ public:
     ~Game();
 
 private:
+    enum GameState
+    {
+        Menu,
+        Playing,
+        MyWin,
+        OpponentWin,
+    };
+
     void mainLoop();
 
     bool initGameWindow(const sf::Vector2u &windowSize);
@@ -41,6 +49,10 @@ private:
 
     void resolveRound();
 
+    void manageGameState();
+
+    GameState checkWin();
+
     sf::RenderWindow *m_window;
 
     std::vector<Figure *> m_figures;
@@ -52,6 +64,8 @@ private:
     bool m_playerTurn;
 
     unsigned char m_difficulty;
+
+    GameState m_gameState;
 
 };
 }; // namespace Checkers
