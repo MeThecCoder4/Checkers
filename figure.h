@@ -50,6 +50,8 @@ private:
     // It is used each time an user wants to jump, to check if that jump is indeed valid.
     std::list<std::string> getValidJumps();
 
+    // int getEnemyCount(const std::string& gameState);
+
     sf::Color m_color;
 
     sf::CircleShape m_shape;

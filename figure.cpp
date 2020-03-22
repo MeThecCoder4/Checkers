@@ -83,11 +83,10 @@ std::string Figure::isJumpValid(const sf::Vector2u &jumpCoords)
     for (string state : validStates)
     {
         reverse(state.begin(), state.end());
-        cout << "Here" << endl;
 
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for(int j = 0; j < 8; j++)
+            for (int j = 0; j < 8; j++)
             {
                 cout << state[i * 8 + j];
             }
@@ -162,3 +161,26 @@ char Figure::getBoardSymbol()
 {
     return m_boardSymbol;
 }
+
+// int Figure::getEnemyCount(const std::string &gameState)
+// {
+//     int counter = 0;
+//     // Decide who is an opponent
+//     char opponentPawn = (m_boardSymbol == Board::Symbols::MyPawn ||
+//                          m_boardSymbol == Board::Symbols::MyCrownhead)
+//                             ? Board::Symbols::OpponentPawn
+//                             : Board::Symbols::MyPawn;
+
+//     char opponentCrownhead = (m_boardSymbol == Board::Symbols::MyPawn ||
+//                               m_boardSymbol == Board::Symbols::MyCrownhead)
+//                                  ? Board::Symbols::OpponentCrownhead
+//                                  : Board::Symbols::OpponentPawn;
+
+//     for(const auto& field : gameState)
+//     {
+//         if(field == opponentPawn || field == opponentCrownhead)
+//             counter++;
+//     }
+
+//     return counter;
+// }

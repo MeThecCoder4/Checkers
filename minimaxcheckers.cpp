@@ -150,7 +150,7 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
 
     for (coords.y = 0; coords.y < m_boardEdge; coords.y++)
     {
-        // Valid fields only
+        // Valid fields only (black fields)
         if (coords.y % 2 == 0)
             coords.x = 1;
         else
@@ -171,7 +171,10 @@ std::list<std::string> MiniMaxCheckers::buildChildren(std::string gameState, boo
                 if (currentFieldChildren.second)
                 {
                     for (const auto &child : currentFieldChildren.first)
+                    {
+                        m_captureStates.emplace_back(child);
                         captures.emplace_back(child);
+                    }
                 }
                 else
                 {
@@ -262,7 +265,7 @@ list<std::string> MiniMaxCheckers::pawnCapture(const std::string &gameState,
                     if (isFieldEmpty(childState, captureCoords))
                     {
                         updateCaptureState(childState, neighs, coords, captureCoords, figure);
-                        m_captureStates.emplace_back(childState);
+                        // m_captureStates.emplace_back(childState);
 
                         // Handle multi captures with recursion
                         pair<string, long> bestState = staticEval(childState);
@@ -316,7 +319,7 @@ list<std::string> MiniMaxCheckers::crownheadCapture(const std::string &gameState
                         if (isFieldEmpty(childState, captureCoords))
                         {
                             updateCaptureState(childState, neighs, coords, captureCoords, figure);
-                            m_captureStates.emplace_back(childState);
+                            // m_captureStates.emplace_back(childState);
 
                             // Handle multi captures with recursion
                             pair<string, long> bestState = staticEval(childState);
